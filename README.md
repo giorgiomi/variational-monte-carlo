@@ -13,7 +13,7 @@ $$\Psi(r_1,\dots,r_N)=\exp{\left(-\frac{1}{2\alpha}\sum_{i = 1}^Nr_i^2-\frac{1}{
 with $u_\beta(r) = (\beta_1/r)^{\beta_2}$.
 
 ## Compilation and execution
-Move to the `src` folder and compile using:
+Compile in the repository directory using:
 ```
     make
 ```
