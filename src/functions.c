@@ -1,5 +1,15 @@
 #include <math.h>
 
+#define H2_2M 6.0596 // h bar squared over 2 time mass, [Å^2 K]
+
+// copy array
+void copy_array(double *a, double *b, int N){
+    for (int i = 0; i < N; i++){
+        b[i] = a[i];
+    }
+    return;
+}
+
 // scalar product
 double scalar_product(double *a, double *b) {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -33,8 +43,14 @@ double lennard_jones(double r, double *param) {
     return 4 * eps * (pow(sigma / r, 12) - pow(sigma / r, 6));
 }
 
+// psi
+// double psi(double *r, double *param, int N) {
+//     double alpha = param[0];
+//     double beta[2] = {param[1], param[2]};
+// }
+
 // kinetic energy
-double kinetic_energy(double *r, double *param, int N, double h2_2m) {
+double kinetic_energy(double *r, double *param, int N) {
     double alpha = param[0];
     double beta[2] = {param[1], param[2]};
     double res = 0.;
@@ -67,6 +83,6 @@ double kinetic_energy(double *r, double *param, int N, double h2_2m) {
         }
     }
 
-    res *= h2_2m;
+    res *= H2_2M;
     return res;
 }

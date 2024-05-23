@@ -2,6 +2,11 @@
 #define FUNCTIONS_H
 
 /*
+Copy array a to array b
+*/
+void copy_array(double *a, double *b, int N);
+
+/*
 Returns the scalar product of two vectors a and b (pointers)
 */
 double scalar_product(double *a, double *b);
