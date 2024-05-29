@@ -32,16 +32,16 @@ int main(int argc, char **argv) {
 
     // initial configuration
 
+    double old_r[3 * N];
     for (int i = 0; i < n_steps; i++) {
         // calculate observables
         double E = energy(r, var_param, N);
         fprintf(f_energy, "%d,%.10e\n", i, E);
-
+        
         // update configuration with M(RT)^2
         int part_index = i % N;
-        double old_r[3 * N];
         copy_array(r, old_r, 3 * N);
-
+        
         // update positions with T function (uniform)
         for (int j = 0; j < 3; j++) {
             double csi = 2. * (rand() / (1.0 + RAND_MAX)) - 1.;
@@ -57,6 +57,7 @@ int main(int argc, char **argv) {
         if (a < a_rand) {
             copy_array(old_r, r, 3 * N);
         }
+        printf("Step %d\n", i);
     }
 
     return 0;
