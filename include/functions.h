@@ -7,6 +7,11 @@ Copy array a to array b
 void copy_array(double *a, double *b, int N);
 
 /*
+Print array a as such: a[0] a[1] ... a[N-1]
+*/
+void print_array(double *a, int N);
+
+/*
 Returns the scalar product of two vectors a and b (pointers)
 */
 double scalar_product(double *a, double *b);

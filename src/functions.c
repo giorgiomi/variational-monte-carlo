@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdio.h>
 
 #define H2_2M 6.0596 // h bar squared over 2 time mass, [Å^2 K]
 
@@ -7,6 +8,15 @@ void copy_array(double *a, double *b, int N){
     for (int i = 0; i < N; i++){
         b[i] = a[i];
     }
+    return;
+}
+
+// print array
+void print_array(double *a, int N){
+    for (int i = 0; i < N; i++){
+        printf("%f ", a[i]);
+    }
+    printf("\n");
     return;
 }
 
