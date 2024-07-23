@@ -29,8 +29,6 @@ int main(int argc, char **argv) {
         default:
             return 1;
     }
-
-
     int N = atoi(argv[1]); //2
     int n_steps = atoi(argv[2]); //200
     double delta = atof(argv[3]); //0.1

@@ -19,6 +19,6 @@ Compile in the repository directory using:
 ```
 An executable named `run` will be generated. Use
 ```
-    ./run
+    ./run N n_steps delta
 ```
-to execute it.
+to execute it, where `N` is the number of particles, `n_steps` is the number of Metropolis steps and `delta` is the value for the proposed step.
