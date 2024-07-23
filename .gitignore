@@ -1,4 +1,26 @@
+# Executables
 *.x
 run
+
+# VS Code
 .vscode
+
+# Files
 *.csv
+
+# Mac stuff
+.DS_Store
+
+#TEX
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.bbl
+*.bcf
+*.fdb_latexmk
+*.fls
+*.blg
+*.run.xml
+main-frn.pdf
+main-frn.tex

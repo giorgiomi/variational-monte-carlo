@@ -1,0 +1,57 @@
+\documentclass[a4paper, titlepage]{article}
+\input{packages}
+
+%%% Il documento vero e proprio %%%
+\begin{document}
+\input{frontespizio}
+\newcommand{\sch}[0]{Schrödinger }
+%\newcommand{\vv}[0]{Velocity-Verlet }
+\newcommand{\lj}[0]{Lennard-Jones }
+\newcommand{\boldalpha}[0]{{\boldsymbol{\alpha}}}
+
+\section{Introduzione}
+L'obiettivo di questo progetto è calcolare l'energia dello stato fondamentale di un sistema di $^4\ce{He}$ in un potenziale esterno armonico con il metodo di Monte Carlo Variazionale. L'operatore hamiltoniano che descrive il sistema è dunque
+\begin{equation*}
+    H = -\frac{\hbar^2}{2m} \sum_{i = 1}^N \nabla_i^2 + \frac{1}{2} \omega^2 \sum_{i = 1}^N r_i^2 + \sum_{i < j} V(r_{ij}) 
+    \quad\text{con}\quad 
+    V(r) = 4\varepsilon\left[\left(\frac{\sigma}{r}\right)^{12} - \left(\frac{\sigma}{r}\right)^{6}\right],
+\end{equation*}
+che è il potenziale di \lj classico. Per usare unità di \unit{\angstrom} per le lunghezze e \unit{\kelvin} per le energie, nel caso dell'elio si hanno
+\[
+\varepsilon = 10.22\ \unit{\kelvin}, \quad
+\sigma = 2.556\ \unit{\angstrom}, \quad 
+\frac{\hbar^2}{2m} = 6.0596\ \unit{\square\angstrom\kelvin}.
+\]
+Sia $\Psi_{\boldsymbol{\alpha}}(\mathbf{R}) = \langle\mathbf{R}|\Psi_{\boldsymbol{\alpha}}\rangle$ una funzione d'onda parametrica per il sistema, in cui $\mathbf{R} = (\mathbf{r}_1, \mathbf{r}_2, \dots, \mathbf{r}_N)$ e $\boldsymbol{\alpha}$ è il set di parametri liberi. Il metodo variazionale permette di affermare che
+\[
+\min_{\boldsymbol{\alpha}} E_{\boldsymbol{\alpha}} = \min_{\boldsymbol{\alpha}} \frac{\langle\Psi_{\boldsymbol{\alpha}}|H|\Psi_{\boldsymbol{\alpha}}\rangle}{\langle\Psi_{\boldsymbol{\alpha}}|\Psi_{\boldsymbol{\alpha}}\rangle} \geq E_0
+\]
+ed $E_{\boldsymbol{\alpha}}$ si può valutare con una simulazione Monte Carlo usando $P(\mathbf{R}) = |\Psi_{\boldsymbol{\alpha}}(\mathbf{R})|^2$, mentre gli osservabili si calcoleranno con
+\[
+O_\boldalpha = \frac{1}{M}\sum_{k = 1}^M \frac{O\Psi_\boldalpha(\mathbf{R}_k)}{\Psi_\boldalpha(\mathbf{R}_k)}.
+\]
+La scelta intrapresa per la funzione d'onda, con $\boldalpha = (\alpha, \beta_1, \beta_2)$, è 
+\[
+\Psi_\boldalpha(\mathbf{R}) = \exp\left(-\frac{1}{2\alpha}\sum_{i = 1}^Nr_i^2-\frac{1}{2}\sum_{i < j}u_\beta(r_{ij})\right) \quad\text{con}\quad u_\beta(r) = \left(\frac{\beta_1}{r}\right)^{\beta_2}.
+\]
+
+\subsection{Energia cinetica}
+Per la forma della funzione d'onda usata, conviene calcolare il contributo della particella i-esima all'energia cinetica nel seguente modo:
+\[
+T_i = -\frac{\hbar^2}{2m}\left(\nabla_i^2\log\Psi + (\boldsymbol{\nabla}_i\log\Psi)^2\right),
+\]
+che in funzione di $u_\beta(r)$ e delle sue derivate prima e seconda diventa
+\[
+T_i = \frac{\hbar^2}{2m}
+\left[
+\frac{3}{\alpha} + 
+\frac{1}{2}\sum_{j\neq i} u_\beta''(r_{ij}) + 
+\sum_{j\neq i} \frac{u_\beta'(r_{ij})}{r_{ij}} -
+\frac{1}{\alpha^2}r_i^2 - 
+\frac{1}{\alpha} \sum_{j\neq i} u_\beta'(r_{ij}) \mathbf{r}_i \cdot \hat{\mathbf{r}}_{ij} - 
+\frac{1}{4}\left(\sum_{j\neq i} u_\beta'(r_{ij}) \hat{\mathbf{r}}_{ij}\right)^2
+\right]
+\]
+
+
+\end{document}
