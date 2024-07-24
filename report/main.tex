@@ -12,7 +12,7 @@
 \section{Introduzione}
 L'obiettivo di questo progetto è calcolare l'energia dello stato fondamentale di un sistema di $^4\ce{He}$ in un potenziale esterno armonico con il metodo di Monte Carlo Variazionale. L'operatore hamiltoniano che descrive il sistema è dunque
 \begin{equation*}
-    H = -\frac{\hbar^2}{2m} \sum_{i = 1}^N \nabla_i^2 + \frac{1}{2} \omega^2 \sum_{i = 1}^N r_i^2 + \sum_{i < j} V(r_{ij}) 
+    H = -\frac{\hbar^2}{2m} \sum_{i = 1}^N \nabla_i^2 + \frac{1}{2} m\omega^2 \sum_{i = 1}^N r_i^2 + \sum_{i < j} V(r_{ij}) 
     \quad\text{con}\quad 
     V(r) = 4\varepsilon\left[\left(\frac{\sigma}{r}\right)^{12} - \left(\frac{\sigma}{r}\right)^{6}\right],
 \end{equation*}
@@ -40,7 +40,7 @@ Per la forma della funzione d'onda usata, conviene calcolare il contributo della
 \[
 T_i = -\frac{\hbar^2}{2m}\left(\nabla_i^2\log\Psi + (\boldsymbol{\nabla}_i\log\Psi)^2\right),
 \]
-che in funzione di $u_\beta(r)$ e delle sue derivate prima e seconda diventa
+che in funzione di $u_\beta(r_{ij})$, dove $r_{ij} = |\mathbf{r}_i - \mathbf{r}_j|$, e delle sue derivate prima e seconda diventa
 \[
 T_i = \frac{\hbar^2}{2m}
 \left[
@@ -50,8 +50,26 @@ T_i = \frac{\hbar^2}{2m}
 \frac{1}{\alpha^2}r_i^2 - 
 \frac{1}{\alpha} \sum_{j\neq i} u_\beta'(r_{ij}) \mathbf{r}_i \cdot \hat{\mathbf{r}}_{ij} - 
 \frac{1}{4}\left(\sum_{j\neq i} u_\beta'(r_{ij}) \hat{\mathbf{r}}_{ij}\right)^2
-\right]
+\right].
 \]
 
+\subsection{Energia totale per 2 particelle}
+Nel caso in cui $N = 2$, i contributi all'energia cinetica sono esprimibili in modo semplice, e l'energia totale risulta
+\begin{equation}
+    \begin{split}
+    H = &\frac{\hbar^2}{2m}
+    \left[
+    \frac{6}{\alpha} +
+    u_\beta''(r_{12}) +
+    2\frac{u_\beta'(r_{12})}{r_{12}} -
+    \frac{1}{\alpha^2}(r_1^2 + r_2^2) - 
+    \frac{1}{\alpha}r_{12}u_\beta'(r_{12}) - 
+    \frac{1}{2}(u_\beta'(r_{12}))^2
+    \right] + \\
+    &+\frac{1}{2}m\omega^2(r_1^2 + r_2^2) + 
+    4\varepsilon\left[\left(\frac{\sigma}{r_{12}}\right)^{12} - \left(\frac{\sigma}{r_{12}}\right)^{6}\right].
+    \end{split}
+\end{equation}
+Inoltre, si vuole che l'energia sia finita per $r_{12}\rightarrow 0$, e da questo si può fissare il parametro $\beta_2$
 
 \end{document}
