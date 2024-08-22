@@ -8,7 +8,7 @@
 #define SIGMA 2.556 //[Å]
 #define A0 5.       //[Å]
 
-double energy(double *r, double *var_param, int N) {
+double potential_energy(double *r, double *var_param, int N) {
     return kinetic_energy(r, var_param, N);
 }
 
@@ -43,20 +43,22 @@ int main(int argc, char **argv) {
 
     // file
     FILE *f_energy = fopen("data/energy.csv", "w");
-    fprintf(f_energy, "i,E\n");
+    fprintf(f_energy, "i,T,V,E\n");
 
     // initial configuration
 
-    double *old_r = malloc(3 * N * sizeof(double));
+    double *r_old = malloc(3 * N * sizeof(double));
     for (int i = 0; i < n_steps; i++) {
         // calculate observables
-        double E = energy(r, var_param, N);
-        fprintf(f_energy, "%d,%.10e\n", i, E);
+        double T = kinetic_energy(r, var_param, N);
+        double V = potential_energy(r, var_param, N);
+        double E = T + V;
+        fprintf(f_energy, "%d,%.10e,%.10e,%.10e\n", i, T, V, E);
         
         // update configuration with M(RT)^2
         int part_index = i % N;
-        copy_array(r, old_r, 3 * N);
-        //print_array(old_r, 3 * N);
+        copy_array(r, r_old, 3 * N);
+        //print_array(r_old, 3 * N);
         
         // update positions with T function (uniform)
         for (int j = 0; j < 3; j++) {
@@ -69,13 +71,16 @@ int main(int argc, char **argv) {
         double E_proposed = energy(r, var_param, N);
         
         // accepting the proposed step
-        double a = acceptance(old_r, r, part_index, var_param, N);
+        double a = acceptance(r_old, r, part_index, var_param, N);
         double a_rand = rand() / (1.0 + RAND_MAX);
         if (a < a_rand) {
-            copy_array(old_r, r, 3 * N);
+            copy_array(r_old, r, 3 * N);
         }
         //printf("Step %d\n", i);
     }
+
+    free(r);
+    free(r_old);
 
     return 0;
 }

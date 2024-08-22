@@ -2,6 +2,8 @@
 #include <stdio.h>
 
 #define H2_2M 6.0596 // h bar squared over 2 time mass, [Å^2 K]
+#define EPS 10.22   //[K]
+#define SIGMA 2.556 //[Å]
 
 // copy array
 void copy_array(double *a, double *b, int N){
@@ -47,10 +49,8 @@ double u_doubleprime(double r, double *beta) {
 }
 
 // LJ
-double lennard_jones(double r, double *param) {
-    double eps = param[0];
-    double sigma = param[1];
-    return 4 * eps * (pow(sigma / r, 12) - pow(sigma / r, 6));
+double lennard_jones(double r) {
+    return 4 * EPS * (pow(SIGMA / r, 12) - pow(SIGMA / r, 6));
 }
 
 // psi
@@ -95,4 +95,31 @@ double kinetic_energy(double *r, double *param, int N) {
 
     res *= H2_2M;
     return res;
+}
+
+// harmonic potential after 1 move
+double harmonic_potential(double *r_old, double *r_new, double VH_old, int part_index, int N) {
+    double omega = 1.; // where?
+    double r2_old = scalar_product(r_old + 3 * part_index, r_old + 3 * part_index);
+    double r2_new = scalar_product(r_new + 3 * part_index, r_new + 3 * part_index);
+    
+    return VH_old - 0.5 * omega * (r2_old - r2_new);
+}
+
+// LJ potential single contribution
+double LJ_potential_single(double *r, int part_index, int N) {
+    double VLJ_new = 0.;
+    for (int i = 0; i < N; i++) {
+        if (i != part_index) {
+            double rij[3] = {r[3 * i] - r[3 * part_index], r[3 * i + 1] - r[3 * part_index + 1], r[3 * i + 2] - r[3 * part_index + 2]};
+            double rij_mod = sqrt(scalar_product(rij, rij));
+            VLJ_new += lennard_jones(rij_mod);
+        }
+    }
+    return VLJ_new;
+}
+
+// LJ potential after 1 move
+double LJ_potential(double *r_old, double *r_new, double VLJ_old, int part_index, int N) {
+    return VLJ_old - LJ_potential_single(r_old, part_index, N) + LJ_potential_single(r_new, part_index, N);
 }
