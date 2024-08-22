@@ -4,6 +4,7 @@
 #define H2_2M 6.0596 // h bar squared over 2 time mass, [Å^2 K]
 #define EPS 10.22   //[K]
 #define SIGMA 2.556 //[Å]
+#define A0 5.       //[Å]
 
 // copy array
 void copy_array(double *a, double *b, int N){
@@ -65,28 +66,28 @@ double kinetic_energy(double *r, double *param, int N) {
     double beta[2] = {param[1], param[2]};
     double res = 0.;
 
-    // cycle through k to calculate each kinetic contribution
-    for (int k = 0; k < N; k++) {
-        double rk[3] = {r[3 * k], r[3 * k + 1], r[3 * k + 2]};
-        double rk_mod2 = scalar_product(rk, rk);
+    // cycle through i to calculate each kinetic contribution
+    for (int i = 0; i < N; i++) {
+        double ri[3] = {r[3 * i], r[3 * i + 1], r[3 * i + 2]};
+        double ri_mod2 = scalar_product(ri, ri);
         res += 3. / alpha;
-        res += -rk_mod2 / (alpha * alpha);
+        res -= ri_mod2 / (alpha * alpha);
 
-        // cycle through j != k
+        // cycle through j != i
         for (int j = 0; j < N; j++) {
-            if (j != k) {
-                double rkj[3] = {rk[0] - r[3 * j], rk[1] - r[3 * j + 1], rk[2] - r[3 * j + 2]};
-                double rkj_mod = sqrt(scalar_product(rkj, rkj));
-                res += 0.5 * u_doubleprime(rkj_mod, beta);
-                res += u_prime(rkj_mod, beta) / rkj_mod;
-                res += -u_prime(rkj_mod, beta) * scalar_product(rk, rkj) / (rkj_mod * alpha);
+            if (j != i) {
+                double rij[3] = {ri[0] - r[3 * j], ri[1] - r[3 * j + 1], ri[2] - r[3 * j + 2]};
+                double rij_mod = sqrt(scalar_product(rij, rij));
+                res += 0.5 * u_doubleprime(rij_mod, beta);
+                res += u_prime(rij_mod, beta) / rij_mod;
+                res -= u_prime(rij_mod, beta) * scalar_product(ri, rij) / (rij_mod * alpha);
 
-                // cycle through l != k
+                // cycle through l != i
                 for (int l = 0; l < N; l++) {
-                    if (l != k) {
-                        double rkl[3] = {rk[0] - r[3 * l], rk[1] - r[3 * l + 1], rk[2] - r[3 * l + 2]};
-                        double rkl_mod = sqrt(scalar_product(rkl, rkl));
-                        res += u_prime(rkj_mod, beta) * u_prime(rkl_mod, beta) * scalar_product(rkj, rkl) / (rkj_mod * rkl_mod);
+                    if (l != i) {
+                        double ril[3] = {ri[0] - r[3 * l], ri[1] - r[3 * l + 1], ri[2] - r[3 * l + 2]};
+                        double ril_mod = sqrt(scalar_product(ril, ril));
+                        res -= 0.25 * u_prime(rij_mod, beta) * u_prime(ril_mod, beta) * scalar_product(rij, ril) / (rij_mod * ril_mod);
                     }
                 }
             }
@@ -99,11 +100,11 @@ double kinetic_energy(double *r, double *param, int N) {
 
 // harmonic potential after 1 move
 double harmonic_potential(double *r_old, double *r_new, double VH_old, int part_index, int N) {
-    double omega = 1.; // where?
+    double m_omega2 = H2_2M * 2. / pow(A0, 4);
     double r2_old = scalar_product(r_old + 3 * part_index, r_old + 3 * part_index);
     double r2_new = scalar_product(r_new + 3 * part_index, r_new + 3 * part_index);
     
-    return VH_old - 0.5 * omega * (r2_old - r2_new);
+    return VH_old - 0.5 * m_omega2 * (r2_old - r2_new);
 }
 
 // LJ potential single contribution

@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 
     // variational parameters, to vary
     double alpha = 1.;
-    double beta1 = 1.;
+    double beta1 = 0.;
     double var_param[2] = {alpha, beta1};
 
     // positions
