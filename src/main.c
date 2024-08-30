@@ -7,6 +7,7 @@
 #define EPS 10.22   //[K]
 #define SIGMA 2.556 //[Å]
 #define A0 5.       //[Å]
+#define BETA2 4.    // adimensional
 
 double potential_energy(double *r, double *var_param, int N) {
     return kinetic_energy(r, var_param, N);
@@ -36,7 +37,7 @@ int main(int argc, char **argv) {
     // variational parameters, to vary
     double alpha = 1.;
     double beta1 = 0.;
-    double var_param[2] = {alpha, beta1};
+    double var_param[3] = {alpha, beta1, BETA2};
 
     // positions
     double *r = malloc(3 * N * sizeof(double));
@@ -46,7 +47,11 @@ int main(int argc, char **argv) {
     fprintf(f_energy, "i,T,V,E\n");
 
     // initial configuration
-
+    for (int i = 0; i < 3 * N; i++) {
+        r[i] = 0.;
+    }
+     
+    // simulation
     double *r_old = malloc(3 * N * sizeof(double));
     for (int i = 0; i < n_steps; i++) {
         // calculate observables
