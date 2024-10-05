@@ -68,6 +68,14 @@ VLJ_old: old LJ potential
 part_index: index of the particle that moved
 N: number of particles
 */
-double harmonic_potential(double *r_old, double *r_new, double VH_old, int part_index, int N);
+double LJ_potential(double *r_old, double *r_new, double VH_old, int part_index, int N);
+
+/*
+Calculates the potential energy for N particles (LJ + harmonic) by brute force
+r: positions
+var_param: variational parameters
+N: number of particles
+*/
+double potential_bruteforce(double *r, double *var_param, int N);
 
 #endif

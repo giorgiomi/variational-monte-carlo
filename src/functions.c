@@ -124,3 +124,31 @@ double LJ_potential_single(double *r, int part_index, int N) {
 double LJ_potential(double *r_old, double *r_new, double VLJ_old, int part_index, int N) {
     return VLJ_old - LJ_potential_single(r_old, part_index, N) + LJ_potential_single(r_new, part_index, N);
 }
+
+// total potential (brute force)
+double potential_bruteforce(double *r, double *param, int N) {
+    double alpha = param[0];
+    double beta[2] = {param[1], param[2]};
+    double res = 0.;
+    double m_omega2 = H2_2M * 2. / pow(A0, 4);
+
+    // LJ
+    double VLJ = 0.;
+    for (int i = 0; i < N; i++) {
+        for (int j = i + 1; j < N; j++) {
+            double rij[3] = {r[3 * i] - r[3 * j], r[3 * i + 1] - r[3 * j + 1], r[3 * i + 2] - r[3 * j + 2]};
+            double rij_mod = sqrt(scalar_product(rij, rij));
+            VLJ += lennard_jones(rij_mod);
+        }
+    }
+
+    // harmonic
+    double VH = 0.;
+    for (int i = 0; i < N; i++) {
+        double ri[3] = {r[3 * i], r[3 * i + 1], r[3 * i + 2]};
+        double ri_mod2 = scalar_product(ri, ri);
+        VH += 0.5 * m_omega2 * ri_mod2;
+    }
+
+    return VLJ + VH;
+}
