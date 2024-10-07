@@ -21,14 +21,14 @@ plt.plot(i, T, linestyle='-', color='b', label='T')
 # plt.axhline(y=T_avg + T_std, color='r', linestyle='--', label=r'$\langle T \rangle + \sigma$')
 # plt.axhline(y=T_avg - T_std, color='r', linestyle='--', label=r'$\langle T \rangle - \sigma$')
 
-plt.plot(i, V, linestyle='-', color='g', label='V')
+# plt.plot(i, V, linestyle='-', color='g', label='V')
 # plt.plot(i, E, linestyle='-', color='r', label='E')
 
 plt.title('Energy plot')
 plt.xlabel('steps')
 plt.ylabel('energy')
 
-plt.yscale('log')
+# plt.yscale('log')
 
 plt.legend()
 plt.grid(True)
