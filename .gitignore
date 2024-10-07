@@ -25,3 +25,6 @@ run
 *.run.xml
 main-frn.pdf
 main-frn.tex
+
+# notes
+notes.txt

@@ -43,6 +43,16 @@ Calculates the kinetic energy for N particles
 double kinetic_energy(double *r, double *param, int N);
 
 /*
+Calculates the average of the laplactian terms of the kinetic energy for N particles
+*/
+double kinetic_average_laplacian(double *r, double *param, int N);
+
+/*
+Calculates the average of the square gradient terms of the kinetic energy for N particles
+*/
+double kinetic_average_gradient(double *r, double *param, int N);
+
+/*
 Calculates the harmonic potential for N particles after a single particle moved
 r_old: old positions
 r_new: new positions

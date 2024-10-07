@@ -98,6 +98,73 @@ double kinetic_energy(double *r, double *param, int N) {
     return res;
 }
 
+// kinetic energy laplacian average (Green theorem)
+double kinetic_average_laplacian(double *r, double *param, int N) {
+    double alpha = param[0];
+    double beta[2] = {param[1], param[2]};
+    double avg = 0.;
+
+    // cycle through i to calculate each kinetic contribution
+    for (int i = 0; i < N; i++) {
+        avg += 3. / alpha;
+
+        // cycle through j != i
+        for (int j = 0; j < N; j++) {
+            if (j != i) {
+                double rij[3] = {r[3 * i] - r[3 * j], r[3 * i + 1] - r[3 * j + 1], r[3 * i + 2] - r[3 * j + 2]};
+                double rij_mod = sqrt(scalar_product(rij, rij));
+                avg += 0.5 * u_doubleprime(rij_mod, beta) + u_prime(rij_mod, beta) / rij_mod;
+            }
+        }
+    }
+
+    avg *= H2_2M/2;
+    // avg /= N; i should not divide by N
+
+    return avg;
+}
+
+// kinetic energy square gradient average (Green theorem)
+double kinetic_average_gradient(double *r, double *param, int N) {
+    double alpha = param[0];
+    double beta[2] = {param[1], param[2]};
+    double avg = 0.;
+
+    // cycle through i to calculate each kinetic contribution
+    for (int i = 0; i < N; i++) {
+        double ri[3] = {r[3 * i], r[3 * i + 1], r[3 * i + 2]};
+        double ri_mod2 = scalar_product(ri, ri);
+        avg += ri_mod2 / (alpha * alpha);
+
+        // cycle through j != i
+        for (int j = 0; j < N; j++) {
+            if (j != i) {
+                double rij[3] = {r[3 * i] - r[3 * j], r[3 * i + 1] - r[3 * j + 1], r[3 * i + 2] - r[3 * j + 2]};
+                double rij_mod = sqrt(scalar_product(rij, rij));
+                avg += u_prime(rij_mod, beta) * scalar_product(ri, rij) / (rij_mod * alpha);
+
+                // cycle through l != i
+                for (int l = 0; l < N; l++) {
+                    if (l != i) {
+                        double ril[3] = {ri[0] - r[3 * l], ri[1] - r[3 * l + 1], ri[2] - r[3 * l + 2]};
+                        double ril_mod = sqrt(scalar_product(ril, ril));
+                        avg += 0.25 * u_prime(rij_mod, beta) * u_prime(ril_mod, beta) * scalar_product(rij, ril) / (rij_mod * ril_mod);
+                    }
+                }
+            }
+           
+        }
+    }
+
+    avg *= H2_2M;
+    // avg /= N; i should not divide by N
+
+    return avg;
+}
+
+
+
+
 // harmonic potential after 1 move
 double harmonic_potential(double *r_old, double *r_new, double VH_old, int part_index, int N) {
     double m_omega2 = H2_2M * 2. / pow(A0, 4);

@@ -30,25 +30,31 @@ int main(int argc, char **argv) {
         default:
             return 1;
     }
-    int N = atoi(argv[1]); //2
-    int n_steps = atoi(argv[2]); //200
-    double delta = atof(argv[3]); //0.1
+    int N = atoi(argv[1]);
+    int n_steps = atoi(argv[2]);
+    double delta = atof(argv[3]);
 
     // variational parameters, to vary
-    double alpha = 1.;
+    double alpha = 1.; // 1 first try
     double beta1 = 0.; // 0 to remove interaction
     double var_param[3] = {alpha, beta1, BETA2};
 
     // print on terminal simulation parameters
-    printf("\nRunning simulation with N = %d, n_steps = %d, delta = %.2f\n\n", N, n_steps, delta);
+    printf("------------------------------------------------------------------------\n");
+    printf("Running simulation with N = %d, n_steps = %d, delta = %.2f\n\n", N, n_steps, delta);
     printf("Variational parameters: alpha = %.2f, beta1 = %.2f, beta2 = %.2f\n\n", alpha, beta1, BETA2);
 
     // positions
     double *r = malloc(3 * N * sizeof(double));
 
-    // file
+    // files
     FILE *f_energy = fopen("data/energy.csv", "w");
+    FILE *f_kinetic_avg = fopen("data/kinetic_avg.csv", "w");
+    FILE *f_acceptance = fopen("data/acceptance.csv", "w");
     fprintf(f_energy, "i,T,V,E\n");
+    fprintf(f_kinetic_avg, "i,T_lap,T_grad\n");
+    fprintf(f_acceptance, "i,a\n");
+
 
     // initial configuration (positions)
     for (int i = 0; i < 3 * N; i++) {
@@ -61,6 +67,15 @@ int main(int argc, char **argv) {
     double V = potential_energy(r, var_param, N);
     double E = T + V;
     fprintf(f_energy, "0,%.10e,%.10e,%.10e\n", T, V, E);
+
+    // initial observables, kinetic averages
+    double T_lap = kinetic_average_laplacian(r, var_param, N);
+    double T_grad = kinetic_average_gradient(r, var_param, N);
+    fprintf(f_kinetic_avg, "0,%.10e,%.10e\n", T_lap, T_grad);
+
+    // initial acceptance
+    double acc_rate = 0.;
+    fprintf(f_acceptance, "0,%.10e\n", acc_rate);
      
     // MC simulation
     double *r_old = malloc(3 * N * sizeof(double));
@@ -89,6 +104,7 @@ int main(int argc, char **argv) {
         double a_rand = rand() / (1.0 + RAND_MAX);
         if (a < a_rand) {
             copy_array(r_old, r, 3 * N);
+            acc_rate += 1.;
         }
         //printf("Step %d\n", i);
 
@@ -97,8 +113,18 @@ int main(int argc, char **argv) {
         V = potential_energy(r, var_param, N);
         E = T + V;
         fprintf(f_energy, "%d,%.10e,%.10e,%.10e\n", i, T, V, E);
+
+        // calculate kinetic averages
+        T_lap = kinetic_average_laplacian(r, var_param, N);
+        T_grad = kinetic_average_gradient(r, var_param, N);
+        fprintf(f_kinetic_avg, "%d,%.10e,%.10e\n", i, T_lap, T_grad);
+
+        // print acceptance rate
+        fprintf(f_acceptance, "%d,%.10e\n", i, acc_rate / i);
     }
 
+    printf("\n\nSimulation completed\n");
+    printf("------------------------------------------------------------------------\n");
     free(r);
     free(r_old);
 

@@ -7,6 +7,7 @@
 \newcommand{\sch}[0]{Schrödinger }
 %\newcommand{\vv}[0]{Velocity-Verlet }
 \newcommand{\lj}[0]{Lennard-Jones }
+%\renewcommand{\hbar2m}[0]{{\frac{\hbar^2}{2m}}}
 \newcommand{\boldalpha}[0]{{\boldsymbol{\alpha}}}
 
 \section{Introduzione}
@@ -16,7 +17,7 @@ L'obiettivo di questo progetto è calcolare l'energia dello stato fondamentale d
     \quad\text{con}\quad 
     V(r) = 4\varepsilon\left[\left(\frac{\sigma}{r}\right)^{12} - \left(\frac{\sigma}{r}\right)^{6}\right]\, ,
 \end{equation*}
-che è il potenziale di \lj classico. Per usare unità di \unit{\angstrom} per le lunghezze e \unit{\kelvin} per le energie, nel caso dell'elio si hanno
+che è il potenziale di \lj classico. Si studiano 4 sistemi, composti da $N = 2, 4, 6, 8$ particelle. Per usare unità di \unit{\angstrom} per le lunghezze e \unit{\kelvin} per le energie, nel caso dell'elio si hanno
 \[
 \varepsilon = 10.22\ \unit{\kelvin}, \quad
 \sigma = 2.556\ \unit{\angstrom}, \quad 
@@ -71,5 +72,18 @@ Nel caso in cui $N = 2$, i contributi all'energia cinetica sono esprimibili in m
     \end{split}
 \end{equation}
 Inoltre, si vuole che l'energia sia finita per $r_{12}\rightarrow 0$, e da questo si può fissare il parametro $\beta_2$
+
+\section{Simulazione senza interazione e correlazione a due corpi}
+Per prima cosa, si considerano i 4 sistemi senza interazione ($V_{\rm LJ} = 0$) e senza correlazione a due corpi ($\beta_1 = 0$). In questo caso, la funzione d'onda si riduce a $\Psi_\alpha(\mathbf{R}) = \exp(-\frac{1}{2\alpha}\sum_{i = 1}^Nr_i^2)$ e gli stimatori dell'energia cinetica media sono
+\begin{align*}
+    &\langle T \rangle _{\rm lap} = -\frac{\hbar^2}{4m}
+    \sum_{i = 1}^N
+    \langle\nabla_i^2\log\Psi\rangle = \frac{\hbar^2}{2m} \frac{3N}{\alpha}\, .\\
+    &\langle T \rangle _{\rm grad} = -\frac{\hbar^2}{2m}
+    \sum_{i = 1}^N
+    \langle(\boldsymbol{\nabla}_i\log\Psi)^2\rangle =
+    \left(\frac{1}{2}m\omega^2 -  \frac{\hbar^2}{2m} \frac{1}{\alpha^2}\right)
+    \sum_{i=1}^N r_i^2\, .
+\end{align*}
 
 \end{document}
