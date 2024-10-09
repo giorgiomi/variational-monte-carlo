@@ -21,8 +21,10 @@ che è il potenziale di \lj classico. Si studiano 4 sistemi, composti da $N = 2,
 \[
 \varepsilon = 10.22\ \unit{\kelvin}, \quad
 \sigma = 2.556\ \unit{\angstrom}, \quad 
-\frac{\hbar^2}{2m} = 6.0596\ \unit{\square\angstrom\kelvin}\, .
+\frac{\hbar^2}{2m} = 6.0596\ \unit{\square\angstrom\kelvin}, \quad
+a_0 = \sqrt{\frac{\hbar}{m\omega}} = 5\ \unit{\angstrom}\, ,
 \]
+dove $a_0$ è la lunghezza caratteristica che definisce la trappola armonica.
 Sia $\Psi_{\boldsymbol{\alpha}}(\mathbf{R}) = \langle\mathbf{R}|\Psi_{\boldsymbol{\alpha}}\rangle$ una funzione d'onda parametrica per il sistema, in cui $\mathbf{R} = (\mathbf{r}_1, \mathbf{r}_2, \dots, \mathbf{r}_N)$ e $\boldsymbol{\alpha}$ è il set di parametri liberi. Il metodo variazionale permette di affermare che
 \[
 \min_{\boldsymbol{\alpha}} E_{\boldsymbol{\alpha}} = \min_{\boldsymbol{\alpha}} \frac{\langle\Psi_{\boldsymbol{\alpha}}|H|\Psi_{\boldsymbol{\alpha}}\rangle}{\langle\Psi_{\boldsymbol{\alpha}}|\Psi_{\boldsymbol{\alpha}}\rangle} \geq E_0
@@ -71,19 +73,23 @@ Nel caso in cui $N = 2$, i contributi all'energia cinetica sono esprimibili in m
     4\varepsilon\left[\left(\frac{\sigma}{r_{12}}\right)^{12} - \left(\frac{\sigma}{r_{12}}\right)^{6}\right].
     \end{split}
 \end{equation}
-Inoltre, si vuole che l'energia sia finita per $r_{12}\rightarrow 0$, e da questo si può fissare il parametro $\beta_2$
+Inoltre, si vuole che l'energia sia finita per $r_{12}\rightarrow 0$, e da questo si può fissare il parametro $\beta_2$. Ciò è dovuto dal fatto che le derivate di $u_\beta(r)$ si comportano nel seguente modo:
+\[
+    u_\beta'(r) \propto \frac{1}{r^{1+\beta_2}}\, , \quad u_\beta''(r) \propto \frac{1}{r^{2+\beta_2}}\, ,
+\]
+e quindi il termine dominante nell'hamiltoniano è quello che contiene $(u_\beta'(r))^2 \propto 1/r^{2+2\beta_2}$, che deve cancellare il termine dominante $1/r^{12}$ nel potenziale di Lennard-Jones. Si ha quindi che $\beta_2 = 5$.
 
 \section{Simulazione senza interazione e correlazione a due corpi}
 Per prima cosa, si considerano i 4 sistemi senza interazione ($V_{\rm LJ} = 0$) e senza correlazione a due corpi ($\beta_1 = 0$). In questo caso, la funzione d'onda si riduce a $\Psi_\alpha(\mathbf{R}) = \exp(-\frac{1}{2\alpha}\sum_{i = 1}^Nr_i^2)$ e gli stimatori dell'energia cinetica media sono
 \begin{align*}
     &\langle T \rangle _{\rm lap} = -\frac{\hbar^2}{4m}
     \sum_{i = 1}^N
-    \langle\nabla_i^2\log\Psi\rangle = \frac{\hbar^2}{2m} \frac{3N}{\alpha}\, .\\
+    \langle\nabla_i^2\log\Psi\rangle = \frac{\hbar^2}{2m} \frac{3N}{\alpha}\, ,\\
     &\langle T \rangle _{\rm grad} = -\frac{\hbar^2}{2m}
     \sum_{i = 1}^N
     \langle(\boldsymbol{\nabla}_i\log\Psi)^2\rangle =
     \left(\frac{1}{2}m\omega^2 -  \frac{\hbar^2}{2m} \frac{1}{\alpha^2}\right)
-    \sum_{i=1}^N r_i^2\, .
+    \sum_{i=1}^N r_i^2 = \frac{\hbar^2}{2m} \left(\frac{1}{a_0^2} - \frac{1}{\alpha^2}\right)\sum_{i=1}^N r_i^2\, .
 \end{align*}
 
 \end{document}

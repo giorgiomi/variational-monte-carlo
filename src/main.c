@@ -7,7 +7,7 @@
 #define EPS 10.22   //[K]
 #define SIGMA 2.556 //[Å]
 #define A0 5.       //[Å]
-#define BETA2 4.    // adimensional, 4 first try
+#define BETA2 5.    // adimensional, 5 is the correct value to oppose the LJ divergence
 
 double potential_energy(double *r, double *var_param, int N) {
     return potential_bruteforce(r, var_param, N);
