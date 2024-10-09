@@ -14,6 +14,7 @@ double potential_energy(double *r, double *var_param, int N) {
 }
 
 int main(int argc, char **argv) {
+    srand(1);
     // parameters
     switch (argc) {
         case 1:
@@ -59,7 +60,8 @@ int main(int argc, char **argv) {
     // initial configuration (positions)
     for (int i = 0; i < 3 * N; i++) {
         double csi = 2. * (rand() / (1.0 + RAND_MAX)) - 1.;
-        r[i] = delta * csi;
+        r[i] = A0 * csi;
+        // printf("r[%d] = %.2f\n", i, r[i]);
     }
 
     // initial observables
@@ -74,8 +76,8 @@ int main(int argc, char **argv) {
     fprintf(f_kinetic_avg, "0,%.10e,%.10e\n", T_lap, T_grad);
 
     // initial acceptance
-    double acc_rate = 0.;
-    fprintf(f_acceptance, "0,%.10e\n", acc_rate);
+    double rej_rate = 0.;
+    fprintf(f_acceptance, "0,%.10e\n", 1. - rej_rate);
      
     // MC simulation
     double *r_old = malloc(3 * N * sizeof(double));
@@ -95,18 +97,15 @@ int main(int argc, char **argv) {
             double x_test = csi * delta;
             r[3 * part_index + j] += x_test;
         }
-        //print_array(r, 3 * N);
-
-        //double E_proposed = energy(r, var_param, N);
         
         // accepting the proposed step
-        double a = acceptance(r_old, r, part_index, var_param, N);
+        double a = acceptance(r_old, r, var_param, N);
         double a_rand = rand() / (1.0 + RAND_MAX);
         if (a < a_rand) {
             copy_array(r_old, r, 3 * N);
-            acc_rate += 1.;
+            rej_rate += 1.;
         }
-        //printf("Step %d\n", i);
+        //print_array(r, 3 * N);
 
         // calculate observables
         T = kinetic_energy(r, var_param, N);
@@ -120,7 +119,7 @@ int main(int argc, char **argv) {
         fprintf(f_kinetic_avg, "%d,%.10e,%.10e\n", i, T_lap, T_grad);
 
         // print acceptance rate
-        fprintf(f_acceptance, "%d,%.10e\n", i, acc_rate / i);
+        fprintf(f_acceptance, "%d,%.10e\n", i, 1. - rej_rate / i);
     }
 
     printf("\n\nSimulation completed\n");

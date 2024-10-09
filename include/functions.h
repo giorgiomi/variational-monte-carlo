@@ -32,6 +32,11 @@ Returns the second derivative of the function u of a radius r and beta (pointer 
 double u_doubleprime(double r, double *beta);
 
 /*
+Returns the wavefunction for N particles
+*/
+double psi(double *r, double *param, int N);
+
+/*
 Returns the Lennard-Jones potential V(r) for two particles at distance r
 [EPS, SIGMA] constants
 */

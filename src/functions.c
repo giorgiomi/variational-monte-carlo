@@ -55,10 +55,26 @@ double lennard_jones(double r) {
 }
 
 // psi
-// double psi(double *r, double *param, int N) {
-//     double alpha = param[0];
-//     double beta[2] = {param[1], param[2]};
-// }
+double psi(double *r, double *param, int N) {
+    double alpha = param[0];
+    double beta[2] = {param[1], param[2]};
+
+    double r_sum = 0.;
+    double u_sum = 0.;
+    for (int i = 0; i < N; i++) {
+        double ri[3] = {r[i], r[i + 1], r[i + 2]};
+        r_sum += scalar_product(ri, ri);
+        for (int j = 0; j < N; j++) {
+            if (j < i) {
+                double rij[3] = {r[i] - r[j], r[i + 1] - r[j + 1], r[i + 2] - r[j + 2]};
+                double rij_mod = sqrt(scalar_product(rij, rij));
+                u_sum += u(rij_mod, beta);
+            }
+        }
+    }
+
+    return exp(- r_sum / alpha - u_sum);
+}
 
 // kinetic energy
 double kinetic_energy(double *r, double *param, int N) {
@@ -217,5 +233,6 @@ double potential_bruteforce(double *r, double *param, int N) {
         VH += 0.5 * m_omega2 * ri_mod2;
     }
 
-    return VLJ + VH;
+    // return VLJ + VH;
+    return VH;
 }
