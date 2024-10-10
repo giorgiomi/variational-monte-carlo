@@ -71,8 +71,8 @@ int main(int argc, char **argv) {
     fprintf(f_energy, "0,%.10e,%.10e,%.10e\n", T, V, E);
 
     // initial observables, kinetic averages
-    double T_lap = kinetic_average_laplacian(r, var_param, N);
-    double T_grad = kinetic_average_gradient(r, var_param, N);
+    double T_lap = kinetic_estimator_laplacian(r, var_param, N);
+    double T_grad = kinetic_estimator_gradient(r, var_param, N);
     fprintf(f_kinetic_avg, "0,%.10e,%.10e\n", T_lap, T_grad);
 
     // initial acceptance
@@ -114,8 +114,8 @@ int main(int argc, char **argv) {
         fprintf(f_energy, "%d,%.10e,%.10e,%.10e\n", i, T, V, E);
 
         // calculate kinetic averages
-        T_lap = kinetic_average_laplacian(r, var_param, N);
-        T_grad = kinetic_average_gradient(r, var_param, N);
+        T_lap = kinetic_estimator_laplacian(r, var_param, N);
+        T_grad = kinetic_estimator_gradient(r, var_param, N);
         fprintf(f_kinetic_avg, "%d,%.10e,%.10e\n", i, T_lap, T_grad);
 
         // print acceptance rate

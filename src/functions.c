@@ -114,8 +114,8 @@ double kinetic_energy(double *r, double *param, int N) {
     return res;
 }
 
-// kinetic energy laplacian average (Green theorem)
-double kinetic_average_laplacian(double *r, double *param, int N) {
+// kinetic energy estimator with laplacian (Green theorem)
+double kinetic_estimator_laplacian(double *r, double *param, int N) {
     double alpha = param[0];
     double beta[2] = {param[1], param[2]};
     double avg = 0.;
@@ -139,8 +139,8 @@ double kinetic_average_laplacian(double *r, double *param, int N) {
     return avg;
 }
 
-// kinetic energy square gradient average (Green theorem)
-double kinetic_average_gradient(double *r, double *param, int N) {
+// kinetic energy estimator with square gradient (Green theorem)
+double kinetic_estimator_gradient(double *r, double *param, int N) {
     double alpha = param[0];
     double beta[2] = {param[1], param[2]};
     double avg = 0.;
@@ -149,6 +149,7 @@ double kinetic_average_gradient(double *r, double *param, int N) {
     for (int i = 0; i < N; i++) {
         double ri[3] = {r[3 * i], r[3 * i + 1], r[3 * i + 2]};
         double ri_mod2 = scalar_product(ri, ri);
+        printf("\n|r_i|^2: %f\n", ri_mod2);
         avg += ri_mod2 / (alpha * alpha);
 
         // cycle through j != i
