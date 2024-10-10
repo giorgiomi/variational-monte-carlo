@@ -135,7 +135,6 @@ double kinetic_average_laplacian(double *r, double *param, int N) {
     }
 
     avg *= H2_2M/2;
-    // avg /= N; i should not divide by N
 
     return avg;
 }
@@ -173,13 +172,9 @@ double kinetic_average_gradient(double *r, double *param, int N) {
     }
 
     avg *= H2_2M;
-    // avg /= N; i should not divide by N
 
     return avg;
 }
-
-
-
 
 // harmonic potential after 1 move
 double harmonic_potential(double *r_old, double *r_new, double VH_old, int part_index, int N) {
