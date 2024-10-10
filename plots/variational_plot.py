@@ -22,15 +22,15 @@ N = parameters['N'][0]
 n_steps = parameters['n_steps'][0]
 
 # Plot the data
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(8, 6))
 plt.errorbar(alpha, T, yerr=T_std, capsize=2, label='T', fmt='-')
 plt.errorbar(alpha, T_lap, yerr=T_lap_std, capsize=2, label='T_lap', fmt='-')
 plt.errorbar(alpha, T_grad, yerr=T_grad_std, capsize=2, label='T_grad', fmt='-')
-# plt.errorbar(alpha, V, yerr=V_std, capsize=2, label='V', fmt='-o')
-# plt.errorbar(alpha, E, yerr=E_std, capsize=2, label='E', fmt='-o')
+plt.errorbar(alpha, V, yerr=V_std, capsize=2, label='V', fmt='-')
+plt.errorbar(alpha, E, yerr=E_std, capsize=2, label='E', fmt='-')
 
 # Add labels and title
-plt.xlabel(r'Alpha $[Å^2]$')
+plt.xlabel(r'$\alpha$ $[Å^2]$')
 plt.ylabel('Energy [K]')
 plt.title(f'T, V, E for N={N} and {n_steps} steps')
 plt.legend()

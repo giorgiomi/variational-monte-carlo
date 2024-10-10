@@ -73,7 +73,7 @@ double psi(double *r, double *param, int N) {
         }
     }
 
-    return exp(- r_sum / alpha - u_sum);
+    return exp(- r_sum / (2. * alpha) - u_sum / 2.); // remember to divide by 2
 }
 
 // kinetic energy

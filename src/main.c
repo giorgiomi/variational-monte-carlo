@@ -47,8 +47,8 @@ int main(int argc, char **argv) {
     fprintf(f_param, "%d,%d,%.2f\n", N, n_steps, delta);
 
     // starting simul with variational alpha
-    double alpha_start = A0 * A0 - 10.;
-    double alpha_end = A0 * A0 + 10.;
+    double alpha_start = A0 * A0 - 15.;
+    double alpha_end = A0 * A0 + 25.;
     for (double alpha = alpha_start; alpha <= alpha_end; alpha += 1.) {
         double var_param[3] = {alpha, beta1, BETA2};
 
