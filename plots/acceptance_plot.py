@@ -10,7 +10,8 @@ a = data['a']
 # Plot the data
 plt.figure(figsize=(10, 6))
 
-plt.plot(i, a, linestyle='-', color='b', label='a')
+plt.plot(i, a, linestyle='-', label='a')
+plt.axhline(y=0.5, linestyle='--')
 
 plt.title('Acceptance rate')
 plt.xlabel('steps')

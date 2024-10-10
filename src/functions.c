@@ -62,11 +62,11 @@ double psi(double *r, double *param, int N) {
     double r_sum = 0.;
     double u_sum = 0.;
     for (int i = 0; i < N; i++) {
-        double ri[3] = {r[i], r[i + 1], r[i + 2]};
+        double ri[3] = {r[3 * i], r[3 * i + 1], r[3 * i + 2]};
         r_sum += scalar_product(ri, ri);
         for (int j = 0; j < N; j++) {
             if (j < i) {
-                double rij[3] = {r[i] - r[j], r[i + 1] - r[j + 1], r[i + 2] - r[j + 2]};
+                double rij[3] = {r[3 * i] - r[3 * j], r[3 * i + 1] - r[3 * j + 1], r[3 * i + 2] - r[3 * j + 2]};
                 double rij_mod = sqrt(scalar_product(rij, rij));
                 u_sum += u(rij_mod, beta);
             }
@@ -149,7 +149,7 @@ double kinetic_estimator_gradient(double *r, double *param, int N) {
     for (int i = 0; i < N; i++) {
         double ri[3] = {r[3 * i], r[3 * i + 1], r[3 * i + 2]};
         double ri_mod2 = scalar_product(ri, ri);
-        printf("\n|r_i|^2: %f\n", ri_mod2);
+        // printf("\n|r_i|^2: %f\n", ri_mod2);
         avg += ri_mod2 / (alpha * alpha);
 
         // cycle through j != i
@@ -172,6 +172,7 @@ double kinetic_estimator_gradient(double *r, double *param, int N) {
         }
     }
 
+    //avg *= H2_2M*2;
     avg *= H2_2M;
 
     return avg;

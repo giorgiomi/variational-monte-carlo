@@ -14,19 +14,15 @@ T_avg = np.mean(T)
 T_std = np.std(T)
 V_avg = np.mean(V)
 V_std = np.std(V)
+E_avg = np.mean(E)
+E_std = np.std(E)
 
 # Plot the data
 plt.figure(figsize=(10, 6))
 
-plt.plot(i, T, linestyle='-', color='b', label='T')
-plt.axhline(y=T_avg, color='r', linestyle='-', label=r'$\langle T \rangle$')
-# plt.axhline(y=T_avg + T_std, color='r', linestyle='--', label=r'$\langle T \rangle + \sigma$')
-# plt.axhline(y=T_avg - T_std, color='r', linestyle='--', label=r'$\langle T \rangle - \sigma$')
-
-plt.axhline(y=V_avg, color='g', linestyle='-', label=r'$\langle V \rangle$')
-
-plt.plot(i, V, linestyle='-', color='g', label='V')
-plt.plot(i, E, linestyle='-', color='r', label='E')
+plt.plot(i, T, linestyle='-', color='b', label=r'$\langle T \rangle$ = {:.3f} $\pm$ {:.3f}'.format(T_avg, T_std/np.sqrt(len(T))))
+plt.plot(i, V, linestyle='-', color='g', label=r'$\langle V \rangle$ = {:.3f} $\pm$ {:.3f}'.format(V_avg, V_std/np.sqrt(len(V))))
+plt.plot(i, E, linestyle='-', color='r', label=r'$\langle E \rangle$ = {:.3f} $\pm$ {:.3f}'.format(E_avg, E_std/np.sqrt(len(E))))
 
 plt.title('Energy plot')
 plt.xlabel('steps')
