@@ -39,14 +39,14 @@ double u(double r, double *beta) {
 double u_prime(double r, double *beta) {
     double beta1 = beta[0];
     double beta2 = beta[1];
-    return -beta2 * pow(beta1 / r, beta2) / r;
+    return -beta2 * u(r, beta) / r;
 }
 
 // second derivative of u function
 double u_doubleprime(double r, double *beta) {
     double beta1 = beta[0];
     double beta2 = beta[1];
-    return beta2 * (1. + beta2) * pow(beta1 / r, beta2) / (r * r);
+    return beta2 * (1. + beta2) * u(r, beta) / (r * r);
 }
 
 // LJ
@@ -58,18 +58,18 @@ double lennard_jones(double r) {
 double psi(double *r, double *param, int N) {
     double alpha = param[0];
     double beta[2] = {param[1], param[2]};
-
     double r_sum = 0.;
     double u_sum = 0.;
+
     for (int i = 0; i < N; i++) {
         double ri[3] = {r[3 * i], r[3 * i + 1], r[3 * i + 2]};
         r_sum += scalar_product(ri, ri);
-        for (int j = 0; j < N; j++) {
-            if (j < i) {
-                double rij[3] = {r[3 * i] - r[3 * j], r[3 * i + 1] - r[3 * j + 1], r[3 * i + 2] - r[3 * j + 2]};
-                double rij_mod = sqrt(scalar_product(rij, rij));
-                u_sum += u(rij_mod, beta);
-            }
+        for (int j = i + 1; j < N; j++) {
+            double rj[3] = {r[3 * j], r[3 * j + 1], r[3 * j + 2]};
+            double rij[3] = {ri[0] - rj[0], ri[1] - rj[1], ri[2] - rj[2]};
+            double rij_mod = sqrt(scalar_product(rij, rij));
+            u_sum += u(rij_mod, beta);
+            printf("beta2: %f, u: %f\n", beta[1], u(rij_mod, beta));
         }
     }
 
@@ -172,9 +172,7 @@ double kinetic_estimator_gradient(double *r, double *param, int N) {
         }
     }
 
-    //avg *= H2_2M*2;
     avg *= H2_2M;
-
     return avg;
 }
 
@@ -215,10 +213,14 @@ double potential_bruteforce(double *r, double *param, int N) {
     // LJ
     double VLJ = 0.;
     for (int i = 0; i < N; i++) {
+        double ri[3] = {r[3 * i], r[3 * i + 1], r[3 * i + 2]};
         for (int j = i + 1; j < N; j++) {
-            double rij[3] = {r[3 * i] - r[3 * j], r[3 * i + 1] - r[3 * j + 1], r[3 * i + 2] - r[3 * j + 2]};
+            // printf("\ni: %d, j: %d", i, j);
+            double rj[3] = {r[3 * j], r[3 * j + 1], r[3 * j + 2]};
+            double rij[3] = {ri[0] - rj[0], ri[1] - rj[1], ri[2] - rj[2]};
             double rij_mod = sqrt(scalar_product(rij, rij));
             VLJ += lennard_jones(rij_mod);
+            // printf("\nVLJ_%d%d: %f", i, j, lennard_jones(rij_mod));
         }
     }
 
@@ -230,6 +232,7 @@ double potential_bruteforce(double *r, double *param, int N) {
         VH += 0.5 * m_omega2 * ri_mod2;
     }
 
+    // printf("\nVLJ: %f, VH: %f", VLJ, VH);
     return VLJ + VH;
     // return VH;
 }

@@ -9,6 +9,7 @@ import sys
 N = sys.argv[1]
 n_steps = sys.argv[2]
 case = sys.argv[3]
+show = sys.argv[4]
 
 # Load data from CSV file
 path_pattern = f"data/{case}_{N}_{n_steps}/kinetic_avg_*.csv"
@@ -55,4 +56,5 @@ plt.legend()
 plt.tight_layout()
 #plt.grid(True)
 plt.savefig(f'report/figures/{case}/kinetic_{N}_{n_steps}.png', dpi=500)
-plt.show()
+if (show == 'show'):
+    plt.show()

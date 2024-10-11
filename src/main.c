@@ -29,10 +29,10 @@ int main(int argc, char **argv) {
     double delta = 3.5; // nice value for acceptance
 
     // variational parameters, to vary
-    double alpha_start = A0 * A0 - 15.;
-    double alpha_end = A0 * A0 + 25.;
+    double alpha_start = A0 * A0;
+    double alpha_end = A0 * A0;
     double alpha_step = 1.;
-    double beta1 = 2.5; // 0 to remove interaction
+    double beta1 = SIGMA; // 0 to remove interaction
 
     // Create directory name
     char dir_name[50];
