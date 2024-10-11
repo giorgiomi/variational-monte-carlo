@@ -18,24 +18,14 @@ double potential_energy(double *r, double *var_param, int N) {
 int main(int argc, char **argv) {
     srand(1);
     // parameters
-    switch (argc) {
-        case 1:
-            printf("Usage: %s N n_steps alpha_saved\n", argv[0]);
-            return 1;
-        case 2:
-            printf("Please provide the number of steps and the alpha to save\n");
-            return 1;
-        case 3:
-            printf("Please provide the delta\n");
-            return 1;
-        case 4:
-            break;
-        default:
-            return 1;
+    if (argc < 3) {
+        printf("Usage: %s N n_steps [alpha_saved]\n", argv[0]);
+        return 1;
     }
+
     int N = atoi(argv[1]);
     int n_steps = atoi(argv[2]);
-    double alpha_saved = atof(argv[3]);
+    double alpha_saved = (argc == 4) ? atof(argv[3]) : -1.;
     double delta = 3.5; // nice value for acceptance
 
     // variational parameters, to vary
@@ -73,25 +63,30 @@ int main(int argc, char **argv) {
     FILE *f_variational = fopen(variational_path, "w");
     fprintf(f_variational, "alpha,T,T_std,T_lap,T_lap_std,T_grad,T_grad_std,V,V_std,E,E_std\n");
 
-    // create files only to write when alpha == alpha_saved
-    char energy_path[100];
-    snprintf(energy_path, sizeof(energy_path), "%s/energy_%.1f.csv", dir_name, alpha_saved);
-    FILE *f_energy = fopen(energy_path, "w");
+    FILE *f_energy = NULL;
+    FILE *f_kinetic_avg = NULL;
+    FILE *f_acceptance = NULL;
 
-    char kinetic_avg_path[100];
-    snprintf(kinetic_avg_path, sizeof(kinetic_avg_path), "%s/kinetic_avg_%.1f.csv", dir_name, alpha_saved);
-    FILE *f_kinetic_avg = fopen(kinetic_avg_path, "w");
+    if (argc >= 3 && alpha_saved >= 0.) {
+        char energy_path[100];
+        snprintf(energy_path, sizeof(energy_path), "%s/energy_%.1f.csv", dir_name, alpha_saved);
+        f_energy = fopen(energy_path, "w");
 
-    char acceptance_path[100];
-    snprintf(acceptance_path, sizeof(acceptance_path), "%s/acceptance_%.1f.csv", dir_name, alpha_saved);
-    FILE *f_acceptance = fopen(acceptance_path, "w");
+        char kinetic_avg_path[100];
+        snprintf(kinetic_avg_path, sizeof(kinetic_avg_path), "%s/kinetic_avg_%.1f.csv", dir_name, alpha_saved);
+        f_kinetic_avg = fopen(kinetic_avg_path, "w");
 
-    fprintf(f_energy, "i,T,V,E\n");
-    fprintf(f_kinetic_avg, "i,T_lap,T_grad\n");
-    fprintf(f_acceptance, "i,a\n");
+        char acceptance_path[100];
+        snprintf(acceptance_path, sizeof(acceptance_path), "%s/acceptance_%.1f.csv", dir_name, alpha_saved);
+        f_acceptance = fopen(acceptance_path, "w");
+
+        fprintf(f_energy, "i,T,V,E\n");
+        fprintf(f_kinetic_avg, "i,T_lap,T_grad\n");
+        fprintf(f_acceptance, "i,a\n");
+    }
 
     // print on terminal simulation parameters
-    printf("----------------------------------------------------------------------------------\n");
+    printf("==================================================================================\n");    
     printf("Running simulation with N = %d, n_steps = %d, delta = %.2f, alpha_saved = %.1f\n\n", N, n_steps, delta, alpha_saved);
 
     // starting simul with variational alpha
@@ -113,7 +108,7 @@ int main(int argc, char **argv) {
         double T = kinetic_energy(r, var_param, N);
         double V = potential_energy(r, var_param, N);
         double E = T + V;
-        if (alpha == alpha_saved) fprintf(f_energy, "0,%.10e,%.10e,%.10e\n", T, V, E);
+        if (argc >= 3 && alpha == alpha_saved) fprintf(f_energy, "0,%.10e,%.10e,%.10e\n", T, V, E);
 
         // observables avg and std
         double T_avg = 0.;
@@ -126,7 +121,7 @@ int main(int argc, char **argv) {
         // initial observables, kinetic estimators
         double T_lap = kinetic_estimator_laplacian(r, var_param, N);
         double T_grad = kinetic_estimator_gradient(r, var_param, N);
-        if (alpha == alpha_saved) fprintf(f_kinetic_avg, "0,%.10e,%.10e\n", T_lap, T_grad);
+        if (argc >= 3 && alpha == alpha_saved) fprintf(f_kinetic_avg, "0,%.10e,%.10e\n", T_lap, T_grad);
 
         // kinetic estimatos avg and std
         double T_lap_avg = 0.;
@@ -136,14 +131,16 @@ int main(int argc, char **argv) {
 
         // initial acceptance
         double rej_rate = 0.;
-        if (alpha == alpha_saved) fprintf(f_acceptance, "0,%.10e\n", 1. - rej_rate);
+        if (argc >= 3 && alpha == alpha_saved) fprintf(f_acceptance, "0,%.10e\n", 1. - rej_rate);
         
         // MC simul with fixed alpha
         double *r_old = malloc(3 * N * sizeof(double));
         for (int i = 1; i <= n_steps; i++) {
-            // print iteration on terminal
-            // printf("\rIteration: %d/%d", i, n_steps);
-            // fflush(stdout);
+            // print iteration on terminal every 1000 steps
+            // if (i % 1000 == 0 || i == n_steps) {
+            //     printf("\rIteration: %d/%d", i, n_steps);
+            //     fflush(stdout);
+            // }
 
             // update configuration with M(RT)^2
             int part_index = i % N;
@@ -173,7 +170,7 @@ int main(int argc, char **argv) {
             T = kinetic_energy(r, var_param, N);
             V = potential_energy(r, var_param, N);
             E = T + V;
-            if (alpha == alpha_saved) fprintf(f_energy, "%d,%.10e,%.10e,%.10e\n", i, T, V, E);
+            if (argc >= 3 && alpha == alpha_saved) fprintf(f_energy, "%d,%.10e,%.10e,%.10e\n", i, T, V, E);
 
             // observables avg and std
             T_avg += T;
@@ -186,7 +183,7 @@ int main(int argc, char **argv) {
             // calculate kinetic estimators
             T_lap = kinetic_estimator_laplacian(r, var_param, N);
             T_grad = kinetic_estimator_gradient(r, var_param, N);
-            if (alpha == alpha_saved) fprintf(f_kinetic_avg, "%d,%.10e,%.10e\n", i, T_lap, T_grad);
+            if (argc >= 3 && alpha == alpha_saved) fprintf(f_kinetic_avg, "%d,%.10e,%.10e\n", i, T_lap, T_grad);
 
             // kinetic estimators avg and std
             T_lap_avg += T_lap;
@@ -195,7 +192,7 @@ int main(int argc, char **argv) {
             T_grad2_avg += T_grad * T_grad;
 
             // print acceptance rate
-            if (alpha == alpha_saved) fprintf(f_acceptance, "%d,%.10e\n", i, 1. - rej_rate / i);
+            if (argc >= 3 && alpha == alpha_saved) fprintf(f_acceptance, "%d,%.10e\n", i, 1. - rej_rate / i);
         }
         
         // print on file alpha and observables
@@ -216,8 +213,8 @@ int main(int argc, char **argv) {
 
     }
 
-    printf("\n\nSimulation completed\n");
-    printf("----------------------------------------------------------------------------------\n");
+    printf("\n\nSimulation completed 🎉🎊\n");
+    printf("==================================================================================\n");
     
     return 0;
 }
