@@ -8,9 +8,10 @@ import sys
 # Parameters
 N = sys.argv[1]
 n_steps = sys.argv[2]
+case = sys.argv[3]
 
 # Load data from CSV file
-path_pattern = f"data/NOINT_{N}_{n_steps}/kinetic_avg_*.csv"
+path_pattern = f"data/{case}_{N}_{n_steps}/kinetic_avg_*.csv"
 all_files = glob.glob(path_pattern)
 if not all_files:
 	raise FileNotFoundError(f"No files found for pattern: {path_pattern}")
@@ -53,5 +54,5 @@ plt.ylabel('T [K]')
 plt.legend()
 plt.tight_layout()
 #plt.grid(True)
-plt.savefig(f'report/figures/NOINT/kinetic_{N}_{n_steps}.png', dpi=500)
-# plt.show()
+plt.savefig(f'report/figures/{case}/kinetic_{N}_{n_steps}.png', dpi=500)
+plt.show()

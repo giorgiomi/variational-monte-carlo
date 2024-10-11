@@ -8,9 +8,10 @@ import sys
 # Parameters
 N = sys.argv[1]
 n_steps = sys.argv[2]
+case = sys.argv[3]
 
 # Load data from CSV file
-path_pattern = f"data/NOINT_{N}_{n_steps}/energy_*.csv"
+path_pattern = f"data/{case}_{N}_{n_steps}/energy_*.csv"
 all_files = glob.glob(path_pattern)
 all_files = glob.glob(path_pattern)
 if not all_files:
@@ -55,5 +56,5 @@ plt.ylabel('energy [K]')
 plt.legend()
 plt.tight_layout()
 #plt.grid(True)
-plt.savefig(f'report/figures/NOINT/energy_{N}_{n_steps}.png', dpi=500)
-# plt.show()
+plt.savefig(f'report/figures/{case}/energy_{N}_{n_steps}.png', dpi=500)
+plt.show()

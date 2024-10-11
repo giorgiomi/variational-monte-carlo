@@ -67,7 +67,7 @@ axs[0].text(alpha_min_E2 + 9, min_E2 - 0.05, f'$(E/N)_{{min}} \simeq {min_E2:.3f
 
 # Add another box for the alpha value
 bbox_props = dict(boxstyle="round,pad=0.3", edgecolor="gray", facecolor="white", alpha=0.7)
-axs[0].text(alpha_min_E2 + 9, min_E2 - 0.105, f'$\\alpha_{{min}} \simeq {alpha_min_E2:.3f}$ $Å^2$', ha="center", va="bottom", bbox=bbox_props)
+axs[0].text(alpha_min_E2 + 9, min_E2 - 0.105, f'$\\alpha_{{min}} \simeq {alpha_min_E2:.1f}$ $Å^2$', ha="center", va="bottom", bbox=bbox_props)
 
 
 
@@ -85,7 +85,7 @@ axs[1].plot(alpha, E8_std/np.sqrt(8), label=r'$\sigma(E)_{N=8}$')
 
 # Add labels and title to the second subplot
 axs[1].set_xlabel(r'$\alpha$ $[Å^2]$')
-axs[1].set_ylabel(r'$\sigma/N$ [K]')
+axs[1].set_ylabel(r'$\sigma/\sqrt{N}$ [K]')
 axs[1].set_title(f'StDev for N=2,4,6,8 and 1000000 steps')
 axs[1].legend(loc='upper right')
 

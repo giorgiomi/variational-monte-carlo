@@ -230,6 +230,6 @@ double potential_bruteforce(double *r, double *param, int N) {
         VH += 0.5 * m_omega2 * ri_mod2;
     }
 
-    // return VLJ + VH;
-    return VH;
+    return VLJ + VH;
+    // return VH;
 }

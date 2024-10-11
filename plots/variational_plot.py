@@ -9,9 +9,10 @@ plt.rcParams.update({'font.size': 14})
 # Parameters
 N = sys.argv[1]
 n_steps = sys.argv[2]
+case = sys.argv[3]
 
 # Load the data
-data = pd.read_csv(f'data/NOINT_{N}_{n_steps}/variational.csv')
+data = pd.read_csv(f'data/{case}_{N}_{n_steps}/variational.csv')
 
 alpha = data['alpha']
 T = data['T']
@@ -60,5 +61,5 @@ axs[1].legend(loc='upper right')
 
 # Adjust layout and show the plot
 plt.tight_layout()
-plt.savefig(f'report/figures/NOINT/variational_{N}_{n_steps}.png', dpi=500)
-# plt.show()
+plt.savefig(f'report/figures/{case}/variational_{N}_{n_steps}.png', dpi=500)
+plt.show()

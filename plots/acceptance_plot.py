@@ -8,9 +8,10 @@ import glob
 # Parameters
 N = sys.argv[1]
 n_steps = sys.argv[2]
+case = sys.argv[3]
 
 # Load data from CSV file
-path_pattern = f"data/NOINT_{N}_{n_steps}/acceptance_*.csv"
+path_pattern = f"data/{case}_{N}_{n_steps}/acceptance_*.csv"
 all_files = glob.glob(path_pattern)
 all_files = glob.glob(path_pattern)
 if not all_files:
@@ -43,5 +44,5 @@ plt.legend()
 plt.yticks(np.arange(0, 1.1, 0.1))
 plt.tight_layout()
 #plt.grid(True)
-plt.savefig(f'report/figures/NOINT/acceptance_{N}_{n_steps}.png', dpi=500)
+plt.savefig(f'report/figures/{case}/acceptance_{N}_{n_steps}.png', dpi=500)
 # plt.show()

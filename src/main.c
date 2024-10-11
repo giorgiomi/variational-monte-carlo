@@ -32,11 +32,11 @@ int main(int argc, char **argv) {
     double alpha_start = A0 * A0 - 15.;
     double alpha_end = A0 * A0 + 25.;
     double alpha_step = 1.;
-    double beta1 = 0.; // 0 to remove interaction
+    double beta1 = 2.5; // 0 to remove interaction
 
     // Create directory name
     char dir_name[50];
-    snprintf(dir_name, sizeof(dir_name), "data/NOINT_%d_%d", N, n_steps);
+    snprintf(dir_name, sizeof(dir_name), "data/INT_%d_%d", N, n_steps);
 
     // Create the directory
     struct stat st = {0};

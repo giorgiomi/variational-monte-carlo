@@ -1,5 +1,6 @@
 \documentclass[a4paper, titlepage]{article}
 \input{packages}
+\DeclareMathOperator*{\argmin}{argmin}
 
 %%% Il documento vero e proprio %%%
 \begin{document}
@@ -95,10 +96,11 @@ In questo caso, la funzione d'onda si riduce a $\displaystyle \Psi_\alpha(\mathb
     \sum_{i=1}^N r_i^2 = \frac{\hbar^2}{2m} \frac{1}{\alpha^2}\sum_{i=1}^N r_i^2\, .
 \end{align*}
 Inoltre, il sistema si riduce così ad un oscillatore armonico in 3 dimensioni per $N$ particelle (cioè $3N$ gradi di libertà), e dunque lo spettro di energia è calcolabile analiticamente:
-\[
+\begin{equation}
 H|\psi_n\rangle = E_n|\psi_n\rangle \, , \quad
 E_n = 3N\hbar\omega\left(n + \frac{1}{2}\right) \quad \Rightarrow \quad E_0 = 3N\frac{\hbar\omega}{2} \simeq N(0.72715\ \unit{\kelvin})\, .
-\]
+\label{eq:NOINT_ground}
+\end{equation}
 Anche la funzione d'onda dello stato fondamentale è analitica e, a meno di un fattore di normalizzazione, è
 \[
 \psi_0(\mathbf{R}) \propto \exp\left(-\frac{1}{2a_0^2}\sum_{i = 1}^Nr_i^2\right) = \Psi_\alpha(\mathbf{R})|_{\alpha = a_0^2}\, ,
@@ -162,7 +164,6 @@ Lo schema del codice è presentato in Fig.\ \ref{code:scheme}. I parametri utili
 \end{itemize}
 Le posizioni iniziali sono campionate da una distribuzione uniforme tra $-a_0$ e $a_0$ per ogni coordinata, in modo che il potenziale di trappola non sia troppo elevato. Poi, ad ogni step di MC, si sceglie una particella alla volta e si propone uno spostamento uniforme di $\delta$ in ogni direzione. Se la mossa è accettata, si mantiene la configurazione, altrimenti si ripristina la configurazione precedente. Si calcolano energia cinetica e potenziale, assieme agli stimatori dell'energia cinetica. La stima delle osservabili è data dai valori medi, a cui si aggiunge una stima dell'errore calcolando la varianza.
 
-Si presenta in Fig.\ \ref{fig:NOINT_obs} un esempio di andamento delle osservabili in funzione dello step Monte Carlo, con $N = 4$ e $\alpha = 28\ \unit{\angstrom\squared}$.
 \begin{figure}[h!]
     \centering
     \begin{minipage}{0.32 \textwidth}
@@ -184,6 +185,45 @@ Si presenta in Fig.\ \ref{fig:NOINT_obs} un esempio di andamento delle osservabi
     \caption{Grafici delle osservabili per $N = 4$, $\alpha = 28\ \unit{\angstrom\squared}$ e $n_{\rm steps} = \num{4e4}$.}
     \label{fig:NOINT_obs}
 \end{figure}
+Si presenta in Fig.\ \ref{fig:NOINT_obs} un esempio di andamento delle osservabili in funzione dello step Monte Carlo, con $N = 4$ e $\alpha = 28\ \unit{\angstrom\squared}$.
 È necessario precisare che si mostrano solo i primi $\num{4e4}$ step per facilitare la visualizzazione, grazie al fatto che il tempo di equilibrazione risulti trascurabile. Dal primo grafico si osserva che le osservabili sono stabili attorno ad un valor medio, e soprattutto che la varianza di $E$ è ridotta rispetto a quelle di $T$ e $V$. Ciò è probabilmente dovuto al fatto che nel calcolo delle energie ci sono dei termini anticorrelati che si compensano. Il secondo grafico mostra come i due stimatori dell'energia cinetica siano compatibili tra loro: questo è un buon modo per verificare la correttezza della simulazione. Infine, il terzo grafico mostra che l'accettanza è stabile attorno ad un valore poco distante dal $50\%$, che è una condizione necessaria per il buon funzionamento di Metropolis.
+
+Il risultato della computazione effettiva ($10^6$ step) per i valori di $\alpha$ considerati è riportato in Fig.\ \ref{fig:NOINT_var}.
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.49 \textwidth}
+        \centering
+        \includegraphics[width = \linewidth]{figures/NOINT/variational_2_1000000.png}
+    \end{minipage}
+    \begin{minipage}{0.49 \textwidth}
+        \centering
+        \includegraphics[width = \linewidth]{figures/NOINT/variational_4_1000000.png}
+    \end{minipage}
+    \begin{minipage}{0.49 \textwidth}
+        \centering
+        \includegraphics[width = \linewidth]{figures/NOINT/variational_6_1000000.png}
+    \end{minipage}
+    \begin{minipage}{0.49 \textwidth}
+        \centering
+        \includegraphics[width = \linewidth]{figures/NOINT/variational_8_1000000.png}
+    \end{minipage}
+    \caption{Risultati della simulazione per il sistema non interagente e senza correlazione a due corpi.}
+    \label{fig:NOINT_var}
+\end{figure}
+Si nota che il comportamento funzionale delle osservabili e della loro varianza in funzione di $\alpha$ non cambia al variare di $N$, ma differiscono per un fattore. Conviene quindi mostrare $E/N$ in funzione di $\alpha$, in modo da poter anche confrontare i risultati con l'energia esatta.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width = \textwidth]{figures/NOINT/confront_1000000.png}
+    \caption{Energia per particella in funzione di $\alpha$ per il sistema non interagente e senza correlazione a due corpi.}
+    \label{fig:NOINT_confront}
+\end{figure} 
+In Fig.\ \ref{fig:NOINT_confront} si ottiene un meraviglioso risultato: 
+\[
+\min_\alpha\frac{E_\alpha}{N} = 0.72715\ \unit{\kelvin}\, , \quad \argmin_\alpha \frac{E_\alpha}{N} = 25.0\ \unit{\angstrom\squared}\, , \quad \min_\alpha \frac{\sigma_\alpha}{\sqrt{N}} = 0\ \unit{\kelvin}\, .
+\]
+Ciò è in accordo con Eq.\ \ref{eq:NOINT_ground} e mostra che il metodo variazionale funziona correttamente. 
+
+\section{Sistema interagente e con correlazione a due corpi}
+Si considera ora il sistema con potenziale di Lennard-Jones e correlazione a due corpi ($\beta_1 \neq 0$). Innanzitutto, per verificare che la simulazione funzioni, si fissano $\alpha = a_0^2$ e $\beta_1 = 2.5\ \unit{\angstrom}$ e si calcolano le energie dei 4 sistemi.
 
 \end{document}
