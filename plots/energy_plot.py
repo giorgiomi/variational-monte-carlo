@@ -39,18 +39,21 @@ E_avg = np.mean(E)
 E_std = np.std(E)
 
 # Plot the data
-plt.figure(figsize=(10, 6))
+plt.rcParams.update({'font.size': 14})
+plt.figure(figsize=(8, 6))
 
-plt.plot(i, T, linestyle='-', label=r'$\langle T \rangle$ = {:.3f} $\pm$ {:.3f}'.format(T_avg, T_std/np.sqrt(len(T))))
-plt.plot(i, V, linestyle='-', label=r'$\langle V \rangle$ = {:.3f} $\pm$ {:.3f}'.format(V_avg, V_std/np.sqrt(len(V))))
-plt.plot(i, E, linestyle='-', label=r'$\langle E \rangle$ = {:.3f} $\pm$ {:.3f}'.format(E_avg, E_std/np.sqrt(len(E))))
+plt.plot(i, V, linestyle='-', alpha=0.5, label=r'$\langle V \rangle$ = {:.3f} $\pm$ {:.3f} K'.format(V_avg, V_std/np.sqrt(len(V))))
+plt.plot(i, T, linestyle='-', alpha=0.5, label=r'$\langle T \rangle$ = {:.3f} $\pm$ {:.3f} K'.format(T_avg, T_std/np.sqrt(len(T))))
+plt.plot(i, E, linestyle='-', label=r'$\langle E \rangle$ = {:.3f} $\pm$ {:.3f} K'.format(E_avg, E_std/np.sqrt(len(E))))
 
-plt.title(f'Energy plot, N = {N}, steps = {n_steps}, alpha = {alpha}')
+plt.title(f'Energy plot with N = {N}, steps = {n_steps}, alpha = {alpha}')
 plt.xlabel('steps')
-plt.ylabel('energy')
+plt.ylabel('energy [K]')
 
 # plt.yscale('log')
 
 plt.legend()
-plt.grid(True)
-plt.show()
+plt.tight_layout()
+#plt.grid(True)
+plt.savefig(f'report/figures/NOINT/energy_{N}_{n_steps}.png', dpi=500)
+# plt.show()

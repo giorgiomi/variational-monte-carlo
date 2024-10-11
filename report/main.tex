@@ -79,8 +79,11 @@ Inoltre, si vuole che l'energia sia finita per $r_{12}\rightarrow 0$, e da quest
 \]
 e quindi il termine dominante nell'hamiltoniano è quello che contiene $(u_\beta'(r))^2 \propto 1/r^{2+2\beta_2}$, che deve cancellare il termine dominante $1/r^{12}$ nel potenziale di Lennard-Jones. Si ha quindi che $\beta_2 = 5$.
 
-\section{Simulazione senza interazione e correlazione a due corpi}
-Per prima cosa, si considerano i 4 sistemi senza interazione ($V_{\rm LJ} = 0$) e senza correlazione a due corpi ($\beta_1 = 0$). In questo caso, la funzione d'onda si riduce a $\displaystyle \Psi_\alpha(\mathbf{R}) = \exp(-\frac{1}{2\alpha}\sum_{i = 1}^Nr_i^2)$ e gli stimatori dell'energia cinetica media sono
+\section{Sistema non interagente e senza correlazione a due corpi}
+Per prima cosa, si considera il sistema senza interazione ($V_{\rm LJ} = 0$) e senza correlazione a due corpi ($\beta_1 = 0$). I due contributi all'energia del sistema sono quindi l'energia cinetica e il potenziale di trappola armonica.
+
+\subsection{Semplificazione del sistema}
+In questo caso, la funzione d'onda si riduce a $\displaystyle \Psi_\alpha(\mathbf{R}) = \exp(-\frac{1}{2\alpha}\sum_{i = 1}^Nr_i^2)$ e gli stimatori dell'energia cinetica media sono
 \begin{align*}
     &\langle T \rangle _{\rm lap} = -\frac{\hbar^2}{4m}
     \sum_{i = 1}^N
@@ -91,5 +94,96 @@ Per prima cosa, si considerano i 4 sistemi senza interazione ($V_{\rm LJ} = 0$) 
     \frac{\hbar^2}{2m} \frac{1}{\alpha^2}
     \sum_{i=1}^N r_i^2 = \frac{\hbar^2}{2m} \frac{1}{\alpha^2}\sum_{i=1}^N r_i^2\, .
 \end{align*}
+Inoltre, il sistema si riduce così ad un oscillatore armonico in 3 dimensioni per $N$ particelle (cioè $3N$ gradi di libertà), e dunque lo spettro di energia è calcolabile analiticamente:
+\[
+H|\psi_n\rangle = E_n|\psi_n\rangle \, , \quad
+E_n = 3N\hbar\omega\left(n + \frac{1}{2}\right) \quad \Rightarrow \quad E_0 = 3N\frac{\hbar\omega}{2} \simeq N(0.72715\ \unit{\kelvin})\, .
+\]
+Anche la funzione d'onda dello stato fondamentale è analitica e, a meno di un fattore di normalizzazione, è
+\[
+\psi_0(\mathbf{R}) \propto \exp\left(-\frac{1}{2a_0^2}\sum_{i = 1}^Nr_i^2\right) = \Psi_\alpha(\mathbf{R})|_{\alpha = a_0^2}\, ,
+\]
+quindi ci si aspetta che il metodo variazionale fornisca il valore esatto di energia per $\alpha = a_0^2 = 25\ \unit{\angstrom\squared}$. Per questo motivo si decide di variare $\alpha$ in un intorno di $a_0^2$ e di confrontare i risultati ottenuti con il valore esatto.
+
+\subsection{Simulazione e risultati}
+L'algoritmo di Metropolis usato per la simulazione è lo stesso usato nel Monte Carlo classico, con la differenza che qui si sta campionando dalla distribuzione $|\Psi_\alpha(\mathbf{R})|^2$. 
+
+\begin{figure}[h!]
+    \begin{lstlisting}[language=C]
+    for (double alpha = alpha_start; alpha <= alpha_end; alpha += alpha_step) {
+        // initial configuration (positions)
+        for (int i = 0; i < 3 * N; i++) {
+            double csi = 2. * (rand() / (1.0 + RAND_MAX)) - 1.;
+            r[i] = A0 * csi;
+        }
+
+        // MC simulation with fixed alpha
+        for (int i = 1; i <= n_steps; i++) {
+            // choose the particle to move
+            int part_index = i % N;
+            copy_array(r, r_old, 3 * N);
+            
+            // update positions with T function (uniform)
+            for (int j = 0; j < 3; j++) {
+                double csi = 2. * (rand() / (1.0 + RAND_MAX)) - 1.;
+                double x_test = csi * delta;
+                r[3 * part_index + j] += x_test;
+            }
+            
+            // accept or refuse the proposed step
+            double a = acceptance(r_old, r, var_param, N);
+            double a_rand = rand() / (1.0 + RAND_MAX);
+            if (a < a_rand) {
+                copy_array(r_old, r, 3 * N);
+                rej_rate += 1.;
+            } 
+
+            // calculate observables
+            T = kinetic_energy(r, var_param, N);
+            V = potential_energy(r, var_param, N);
+            E = T + V;
+
+            // calculate kinetic estimators
+            T_lap = kinetic_estimator_laplacian(r, var_param, N);
+            T_grad = kinetic_estimator_gradient(r, var_param, N);
+        }
+    }
+    \end{lstlisting}
+    \caption{Schema del codice per la simulazione del sistema non interagente e senza correlazione a due corpi. L'unico parametro variazionale è $\alpha$.}
+    \label{code:scheme}
+\end{figure}
+
+Lo schema del codice è presentato in Fig.\ \ref{code:scheme}. I parametri utilizzati sono:
+\begin{itemize}
+    \item $N = 2, 4, 6, 8$ particelle;
+    \item $n_{\rm steps} = 10^6$ passi Monte Carlo;
+    \item $\delta = 3.5\ \unit{\angstrom}$ per la scelta del passo uniforme;\footnote{Il valore di $\delta$ è stato scelto in modo da avere un'accettanza di $\sim 50\%$ per ogni valore di $\alpha$.}
+    \item $\alpha \in [\alpha_{\rm start}, \alpha_{\rm end}]$ con $\alpha_{\rm start} = 10\ \unit{\angstrom\squared}$, $\alpha_{\rm end} = 50\ \unit{\angstrom\squared}$ e passo $\alpha_{\rm step} = 1\ \unit{\angstrom\squared}$.
+\end{itemize}
+Le posizioni iniziali sono campionate da una distribuzione uniforme tra $-a_0$ e $a_0$ per ogni coordinata, in modo che il potenziale di trappola non sia troppo elevato. Poi, ad ogni step di MC, si sceglie una particella alla volta e si propone uno spostamento uniforme di $\delta$ in ogni direzione. Se la mossa è accettata, si mantiene la configurazione, altrimenti si ripristina la configurazione precedente. Si calcolano energia cinetica e potenziale, assieme agli stimatori dell'energia cinetica. La stima delle osservabili è data dai valori medi, a cui si aggiunge una stima dell'errore calcolando la varianza.
+
+Si presenta in Fig.\ \ref{fig:NOINT_obs} un esempio di andamento delle osservabili in funzione dello step Monte Carlo, con $N = 4$ e $\alpha = 28\ \unit{\angstrom\squared}$.
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.32 \textwidth}
+        \centering
+        \includegraphics[width = \linewidth]{figures/NOINT/energy_4_40000.png}
+        \label{fig:energyNOINT}
+    \end{minipage}
+    \begin{minipage}{0.32 \textwidth}
+        \centering
+        \includegraphics[width = \linewidth]{figures/NOINT/kinetic_4_40000.png}
+        \label{fig:kineticNOINT}
+    \end{minipage}
+    \begin{minipage}{0.32 \textwidth}
+        \centering
+        \includegraphics[width = \linewidth]{figures/NOINT/acceptance_4_40000.png}
+        \label{fig:acceptanceNOINT}
+    \end{minipage}
+    \vspace{-0.5cm}
+    \caption{Grafici delle osservabili per $N = 4$, $\alpha = 28\ \unit{\angstrom\squared}$ e $n_{\rm steps} = \num{4e4}$.}
+    \label{fig:NOINT_obs}
+\end{figure}
+È necessario precisare che si mostrano solo i primi $\num{4e4}$ step per facilitare la visualizzazione, grazie al fatto che il tempo di equilibrazione risulti trascurabile. Dal primo grafico si osserva che le osservabili sono stabili attorno ad un valor medio, e soprattutto che la varianza di $E$ è ridotta rispetto a quelle di $T$ e $V$. Ciò è probabilmente dovuto al fatto che nel calcolo delle energie ci sono dei termini anticorrelati che si compensano. Il secondo grafico mostra come i due stimatori dell'energia cinetica siano compatibili tra loro: questo è un buon modo per verificare la correttezza della simulazione. Infine, il terzo grafico mostra che l'accettanza è stabile attorno ad un valore poco distante dal $50\%$, che è una condizione necessaria per il buon funzionamento di Metropolis.
 
 \end{document}

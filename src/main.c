@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
     }
 
     int N = atoi(argv[1]);
-    int n_steps = atoi(argv[2]);
+    int n_steps = (int)strtod(argv[2], NULL);
     double alpha_saved = (argc == 4) ? atof(argv[3]) : -1.;
     double delta = 3.5; // nice value for acceptance
 

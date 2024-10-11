@@ -25,6 +25,11 @@ run
 *.run.xml
 main-frn.pdf
 main-frn.tex
+*.bcf-SAVE-ERROR
+*.bbl-SAVE-ERROR
 
 # notes
 notes.txt
+
+# images
+*.png

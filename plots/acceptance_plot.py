@@ -29,15 +29,19 @@ for file in all_files:
 alpha = np.mean(alpha_values) if alpha_values else 0.0
 
 # Plot the data
-plt.figure(figsize=(10, 6))
+plt.rcParams.update({'font.size': 14})
+plt.figure(figsize=(8, 6))
 
 plt.plot(i, a, linestyle='-', label='a')
-plt.axhline(y=0.5, linestyle='--')
+plt.axhline(y=0.5, linestyle='--', color='tab:orange', label='50%')
 
-plt.title(f'Acceptance rate, N = {N}, steps = {n_steps}, alpha = {alpha}')
+plt.title(f'Acceptance rate plot with N = {N}, steps = {n_steps}, alpha = {alpha}')
 plt.xlabel('steps')
-plt.ylabel('a')
+plt.ylabel('acceptance rate')
 
 plt.legend()
-plt.grid(True)
-plt.show()
+plt.yticks(np.arange(0, 1.1, 0.1))
+plt.tight_layout()
+#plt.grid(True)
+plt.savefig(f'report/figures/NOINT/acceptance_{N}_{n_steps}.png', dpi=500)
+# plt.show()

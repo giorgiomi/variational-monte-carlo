@@ -36,19 +36,22 @@ T_grad_avg = np.mean(T_grad)
 T_grad_std = np.std(T_grad)
 
 # Add average and standard deviation to the legend
-T_lap_label = f'T_lap = {T_lap_avg:.2f} ± {T_lap_std/np.sqrt(len(T_lap)):.2f} K'
-T_grad_label = f'T_grad = {T_grad_avg:.2f} ± {T_grad_std/np.sqrt(len(T_grad)):.2f} K'
+T_lap_label =r'$\langle T \rangle_{lap}$' + f' = {T_lap_avg:.3f} $\pm$ {T_lap_std/np.sqrt(len(T_lap)):.3f} K'
+T_grad_label =r'$\langle T \rangle_{grad}$' + f' = {T_grad_avg:.3f} $\pm$ {T_grad_std/np.sqrt(len(T_grad)):.3f} K'
 
 # Plot the data
-plt.figure(figsize=(10, 6))
+plt.rcParams.update({'font.size': 14})
+plt.figure(figsize=(8, 6))
 
-plt.plot(i, T_lap, linestyle='-', color='b', label=T_lap_label)
-plt.plot(i, T_grad, linestyle='-', color='g', label=T_grad_label, alpha=0.7)
+plt.plot(i, T_grad, linestyle='-', label=T_grad_label)
+plt.plot(i, T_lap, linestyle='-', label=T_lap_label)
 
-plt.title(f'Kinetic energy averages, N = {N}, steps = {n_steps}, alpha = {alpha}')
+plt.title(f'Kinetic energy estimators with N = {N}, n_steps = {n_steps}, alpha = {alpha}')
 plt.xlabel('steps')
 plt.ylabel('T [K]')
 
 plt.legend()
-plt.grid(True)
-plt.show()
+plt.tight_layout()
+#plt.grid(True)
+plt.savefig(f'report/figures/NOINT/kinetic_{N}_{n_steps}.png', dpi=500)
+# plt.show()
