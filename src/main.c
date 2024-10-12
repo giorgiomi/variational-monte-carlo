@@ -26,13 +26,13 @@ int main(int argc, char **argv) {
     int N = atoi(argv[1]);
     int n_steps = (int)strtod(argv[2], NULL);
     double alpha_saved = (argc == 4) ? atof(argv[3]) : -1.;
-    double delta = 3.5; // nice value for acceptance
+    double delta = 5.; // nice value for acceptance
 
     // variational parameters, to vary
     double alpha_start = A0 * A0;
     double alpha_end = A0 * A0;
     double alpha_step = 1.;
-    double beta1 = SIGMA; // 0 to remove interaction
+    double beta1 = 2.5; // 0 to remove interaction
 
     // Create directory name
     char dir_name[50];
@@ -66,6 +66,7 @@ int main(int argc, char **argv) {
     FILE *f_energy = NULL;
     FILE *f_kinetic_avg = NULL;
     FILE *f_acceptance = NULL;
+    FILE *f_psi = NULL;
 
     if (argc >= 3 && alpha_saved >= 0.) {
         char energy_path[100];
@@ -80,9 +81,14 @@ int main(int argc, char **argv) {
         snprintf(acceptance_path, sizeof(acceptance_path), "%s/acceptance_%.1f.csv", dir_name, alpha_saved);
         f_acceptance = fopen(acceptance_path, "w");
 
+        char psi_path[100];
+        snprintf(psi_path, sizeof(psi_path), "%s/psi_%.1f.csv", dir_name, alpha_saved);
+        f_psi = fopen(psi_path, "w");
+
         fprintf(f_energy, "i,T,V,E\n");
         fprintf(f_kinetic_avg, "i,T_lap,T_grad\n");
         fprintf(f_acceptance, "i,a\n");
+        fprintf(f_psi, "i,psi\n");
     }
 
     // print on terminal simulation parameters
@@ -136,16 +142,9 @@ int main(int argc, char **argv) {
         // MC simul with fixed alpha
         double *r_old = malloc(3 * N * sizeof(double));
         for (int i = 1; i <= n_steps; i++) {
-            // print iteration on terminal every 1000 steps
-            // if (i % 1000 == 0 || i == n_steps) {
-            //     printf("\rIteration: %d/%d", i, n_steps);
-            //     fflush(stdout);
-            // }
-
             // update configuration with M(RT)^2
             int part_index = i % N;
             copy_array(r, r_old, 3 * N);
-            //print_array(r_old, 3 * N);
             
             // update positions with T function (uniform)
             for (int j = 0; j < 3; j++) {
@@ -159,13 +158,9 @@ int main(int argc, char **argv) {
             double a_rand = rand() / (1.0 + RAND_MAX);
             if (a < a_rand) {
                 copy_array(r_old, r, 3 * N);
-                // printf(" Rej\n");
                 rej_rate += 1.;
-            } else {
-                // printf(" Acc\n");
-            }
-            // print_array(r, 3 * N);
-
+            } 
+            
             // calculate observables
             T = kinetic_energy(r, var_param, N);
             V = potential_energy(r, var_param, N);
@@ -193,6 +188,12 @@ int main(int argc, char **argv) {
 
             // print acceptance rate
             if (argc >= 3 && alpha == alpha_saved) fprintf(f_acceptance, "%d,%.10e\n", i, 1. - rej_rate / i);
+
+            // print wavefunction
+            if (argc >= 3 && alpha == alpha_saved) {
+                double psi_curr = psi(r, var_param, N);
+                fprintf(f_psi, "%d,%.10e\n", i, psi_curr);
+            }
         }
         
         // print on file alpha and observables

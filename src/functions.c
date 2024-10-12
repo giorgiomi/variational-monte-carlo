@@ -69,11 +69,11 @@ double psi(double *r, double *param, int N) {
             double rij[3] = {ri[0] - rj[0], ri[1] - rj[1], ri[2] - rj[2]};
             double rij_mod = sqrt(scalar_product(rij, rij));
             u_sum += u(rij_mod, beta);
-            printf("beta2: %f, u: %f\n", beta[1], u(rij_mod, beta));
+            // printf("beta2: %f, u: %f\n", beta[1], u(rij_mod, beta));
         }
     }
 
-    return exp(- r_sum / (2. * alpha) - u_sum / 2.); // remember to divide by 2
+    return exp(- r_sum / (2. * alpha) - u_sum / 2); // remember to divide by 2
 }
 
 // kinetic energy
