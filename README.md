@@ -27,6 +27,14 @@ Compile in the repository directory using:
 ```
 An executable named `run` will be generated. Use
 ```
-    ./run N n_steps delta
+    ./run N n_steps [alpha_saved]
 ```
-to execute it, where `N` is the number of particles, `n_steps` is the number of Metropolis steps and `delta` is the value for the proposed step.
+to execute it, where `N` is the number of particles, `n_steps` is the number of Metropolis steps. `alpha_saved` is optional but it's needed to look at the observables values at a certain value of $\alpha$. For example, executing
+```
+    ./run 2 100000 25.0
+```
+will save the observable values of the simulation for $\alpha = 25\ \text{Å}^2$. Then, to plot the results one can use
+```
+    python3 plots/energy_plot.py N n_steps INT show
+```
+where `INT` and `show` are needed for plotting the interacting simulation results and to show the graph. If the simulation is run with multiple values of the parameter $\alpha$, one can look at the energy as a function of that, by running `plots/variational_plot.py`. At the moment, this can be achieved by modifying `alpha_start` and `alpha_end` in `main.c`.
