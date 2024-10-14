@@ -29,9 +29,9 @@ int main(int argc, char **argv) {
     double delta = 5.; // nice value for acceptance
 
     // variational parameters, to vary
-    double alpha_start = A0 * A0;
-    double alpha_end = A0 * A0;
-    double alpha_step = 1.;
+    double alpha_start = A0 * A0 + 2.;
+    double alpha_end = A0 * A0 + 8.;
+    double alpha_step = 0.1;
     double beta1 = 2.5; // 0 to remove interaction
 
     // Create directory name
@@ -67,6 +67,7 @@ int main(int argc, char **argv) {
     FILE *f_kinetic_avg = NULL;
     FILE *f_acceptance = NULL;
     FILE *f_psi = NULL;
+    FILE *f_positions = NULL;
 
     if (argc >= 3 && alpha_saved >= 0.) {
         char energy_path[100];
@@ -85,10 +86,15 @@ int main(int argc, char **argv) {
         snprintf(psi_path, sizeof(psi_path), "%s/psi_%.1f.csv", dir_name, alpha_saved);
         f_psi = fopen(psi_path, "w");
 
+        char positions_path[100];
+        snprintf(positions_path, sizeof(positions_path), "%s/positions_%.1f.csv", dir_name, alpha_saved);
+        f_positions = fopen(positions_path, "w");
+
         fprintf(f_energy, "i,T,V,E\n");
         fprintf(f_kinetic_avg, "i,T_lap,T_grad\n");
         fprintf(f_acceptance, "i,a\n");
         fprintf(f_psi, "i,psi\n");
+        fprintf(f_positions, "i,position\n");
     }
 
     // print on terminal simulation parameters
@@ -108,6 +114,7 @@ int main(int argc, char **argv) {
         for (int i = 0; i < 3 * N; i++) {
             double csi = 2. * (rand() / (1.0 + RAND_MAX)) - 1.;
             r[i] = A0 * csi;
+            // printf("r[%d] = %f\n", i, r[i]);
         }
 
         // initial observables
@@ -143,17 +150,26 @@ int main(int argc, char **argv) {
         double *r_old = malloc(3 * N * sizeof(double));
         for (int i = 1; i <= n_steps; i++) {
             // update configuration with M(RT)^2
-            int part_index = i % N;
             copy_array(r, r_old, 3 * N);
             
             // update positions with T function (uniform)
-            for (int j = 0; j < 3; j++) {
-                double csi = 2. * (rand() / (1.0 + RAND_MAX)) - 1.;
-                double x_test = csi * delta;
-                r[3 * part_index + j] += x_test;
+            for (int j = 0; j < 3 * N; j++) {
+                r[j] += (2. * (rand() / (1.0 + RAND_MAX)) - 1.) * delta;
+            }
+
+            // print positions
+            if (argc >= 3 && alpha == alpha_saved) {
+                for (int j = 0; j < 3 * N; j++) {
+                    fprintf(f_positions, "%d,%.10e\n", i, r[j]);
+                }
             }
             
             // accepting the proposed step
+            // printf("r_old\n");
+            // print_array(r_old, 3 * N);
+            // printf("r\n");
+            // print_array(r, 3 * N);
+            // printf("\n");
             double a = acceptance(r_old, r, var_param, N);
             double a_rand = rand() / (1.0 + RAND_MAX);
             if (a < a_rand) {
@@ -165,7 +181,6 @@ int main(int argc, char **argv) {
             T = kinetic_energy(r, var_param, N);
             V = potential_energy(r, var_param, N);
             E = T + V;
-            if (argc >= 3 && alpha == alpha_saved) fprintf(f_energy, "%d,%.10e,%.10e,%.10e\n", i, T, V, E);
 
             // observables avg and std
             T_avg += T;
@@ -178,7 +193,6 @@ int main(int argc, char **argv) {
             // calculate kinetic estimators
             T_lap = kinetic_estimator_laplacian(r, var_param, N);
             T_grad = kinetic_estimator_gradient(r, var_param, N);
-            if (argc >= 3 && alpha == alpha_saved) fprintf(f_kinetic_avg, "%d,%.10e,%.10e\n", i, T_lap, T_grad);
 
             // kinetic estimators avg and std
             T_lap_avg += T_lap;
@@ -186,11 +200,12 @@ int main(int argc, char **argv) {
             T_grad_avg += T_grad;
             T_grad2_avg += T_grad * T_grad;
 
-            // print acceptance rate
-            if (argc >= 3 && alpha == alpha_saved) fprintf(f_acceptance, "%d,%.10e\n", i, 1. - rej_rate / i);
-
-            // print wavefunction
+            // print observables and wavefunction
             if (argc >= 3 && alpha == alpha_saved) {
+                fprintf(f_energy, "%d,%.10e,%.10e,%.10e\n", i, T, V, E);
+                fprintf(f_kinetic_avg, "%d,%.10e,%.10e\n", i, T_lap, T_grad);
+                fprintf(f_acceptance, "%d,%.10e\n", i, 1. - rej_rate / i);
+
                 double psi_curr = psi(r, var_param, N);
                 fprintf(f_psi, "%d,%.10e\n", i, psi_curr);
             }

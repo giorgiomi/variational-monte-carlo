@@ -28,7 +28,7 @@ V_std = data['V_std']
 E_std = data['E_std']
 
 # Print energy
-print(f'Energy estimate for N={N} and {n_steps} steps: E = {data["E"][data["alpha"] == 25.0].values[0]:.4f} +/- {data["E_std"][data["alpha"] == 25.0].values[0]:.4f} K')
+# print(f'Energy estimate for N={N} and {n_steps} steps: E = {data["E"][data["alpha"] == 25.0].values[0]:.4f} +/- {data["E_std"][data["alpha"] == 25.0].values[0]:.4f} K')
 
 # Create subplots
 fig, axs = plt.subplots(1, 2, figsize=(12, 4.5))
@@ -48,7 +48,7 @@ axs[0].legend(loc='upper right')
 
 # Second subplot: Plot the standard deviations
 axs[1].plot(alpha, T_std, label=r'$\sigma(T)$')
-axs[1].plot(alpha, np.zeros(len(T_std)), label=r'$\sigma(T_{lap})$')
+axs[1].plot(alpha, T_lap_std, label=r'$\sigma(T_{lap})$')
 axs[1].plot(alpha, T_grad_std, label=r'$\sigma(T_{grad})$')
 axs[1].plot(alpha, V_std, label=r'$\sigma(V)$')
 axs[1].plot(alpha, E_std, label=r'$\sigma(E)$')

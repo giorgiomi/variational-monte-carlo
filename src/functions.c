@@ -178,6 +178,7 @@ double kinetic_estimator_gradient(double *r, double *param, int N) {
     return avg;
 }
 
+/*
 // harmonic potential after 1 move
 double harmonic_potential(double *r_old, double *r_new, double VH_old, int part_index, int N) {
     double m_omega2 = H2_2M * 2. / pow(A0, 4);
@@ -204,12 +205,12 @@ double LJ_potential_single(double *r, int part_index, int N) {
 double LJ_potential(double *r_old, double *r_new, double VLJ_old, int part_index, int N) {
     return VLJ_old - LJ_potential_single(r_old, part_index, N) + LJ_potential_single(r_new, part_index, N);
 }
+*/
 
 // total potential (brute force)
 double potential_bruteforce(double *r, double *param, int N) {
     double alpha = param[0];
     double beta[2] = {param[1], param[2]};
-    double res = 0.;
     double m_omega2 = H2_2M * 2. / pow(A0, 4);
 
     // LJ
@@ -222,7 +223,10 @@ double potential_bruteforce(double *r, double *param, int N) {
             double rij[3] = {ri[0] - rj[0], ri[1] - rj[1], ri[2] - rj[2]};
             double rij_mod = sqrt(scalar_product(rij, rij));
             VLJ += lennard_jones(rij_mod);
-            // printf("\nVLJ_%d%d: %f", i, j, lennard_jones(rij_mod));
+            if (rij_mod < SIGMA) {
+                // printf("\nrij_mod: %f", rij_mod);
+                // printf("\nVLJ_%d%d: %f", i, j, lennard_jones(rij_mod));
+            }
         }
     }
 
