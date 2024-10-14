@@ -92,7 +92,8 @@ double kinetic_energy(double *r, double *param, int N) {
         // cycle through j != i
         for (int j = 0; j < N; j++) {
             if (j != i) {
-                double rij[3] = {ri[0] - r[3 * j], ri[1] - r[3 * j + 1], ri[2] - r[3 * j + 2]};
+                double rj[3] = {r[3 * j], r[3 * j + 1], r[3 * j + 2]};
+                double rij[3] = {ri[0] - rj[0], ri[1] - rj[1], ri[2] - rj[2]};
                 double rij_mod = sqrt(scalar_product(rij, rij));
                 res += 0.5 * u_doubleprime(rij_mod, beta);
                 res += u_prime(rij_mod, beta) / rij_mod;
@@ -101,7 +102,8 @@ double kinetic_energy(double *r, double *param, int N) {
                 // cycle through l != i
                 for (int l = 0; l < N; l++) {
                     if (l != i) {
-                        double ril[3] = {ri[0] - r[3 * l], ri[1] - r[3 * l + 1], ri[2] - r[3 * l + 2]};
+                        double rl[3] = {r[3 * l], r[3 * l + 1], r[3 * l + 2]};
+                        double ril[3] = {ri[0] - rl[0], ri[1] - rl[1], ri[2] - rl[2]};
                         double ril_mod = sqrt(scalar_product(ril, ril));
                         res -= 0.25 * u_prime(rij_mod, beta) * u_prime(ril_mod, beta) * scalar_product(rij, ril) / (rij_mod * ril_mod);
                     }
