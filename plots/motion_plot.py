@@ -14,27 +14,23 @@ show = sys.argv[4]
 # Load data from CSV file
 path_pattern = f"data/{case}_{N}_{n_steps}/positions_*.csv"
 all_files = glob.glob(path_pattern)
-all_files = glob.glob(path_pattern)
 if not all_files:
-	raise FileNotFoundError(f"No files found for pattern: {path_pattern}")
+    raise FileNotFoundError(f"No files found for pattern: {path_pattern}")
 data = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
-#i = data['i']
 pos = data['position']
 
 # Extract alpha from the filenames
 alpha_values = []
 for file in all_files:
-	alpha_match = re.search(r'_(\d+\.\d+)', file)
-	if alpha_match:
-		alpha_values.append(float(alpha_match.group(1)))
+    alpha_match = re.search(r'_(\d+\.\d+)', file)
+    if alpha_match:
+        alpha_values.append(float(alpha_match.group(1)))
 
 alpha = np.mean(alpha_values) if alpha_values else 0.0
 
-import matplotlib.animation as animation
-
 # Plot the data
 plt.rcParams.update({'font.size': 14})
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, axs = plt.subplots(3, 1, figsize=(15, 8))
 
 # Reshape the position array to (n_steps, 3, N)
 positions_reshaped = pos.values.reshape((int(n_steps), 3, int(N)))
@@ -44,30 +40,49 @@ x_positions = positions_reshaped[:, 0, :]
 y_positions = positions_reshaped[:, 1, :]
 z_positions = positions_reshaped[:, 2, :]
 
-# Initialize the plot
-lines = [ax.plot([], [], label=f'Particle {i+1}')[0] for i in range(int(N))]
+# Plot x1, x2
+time_steps = np.arange(int(n_steps))
+for i in range(min(2, int(N))):  # Plot only the first two particles
+    axs[0].plot(time_steps, x_positions[:, i], label=f'x{i+1}')
+    axs[1].plot(time_steps, y_positions[:, i], label=f'y{i+1}')
+    axs[2].plot(time_steps, z_positions[:, i], label=f'z{i+1}')
 
-ax.set_xlim(np.min(x_positions), np.max(x_positions))
-ax.set_ylim(np.min(y_positions), np.max(y_positions))
-ax.set_xlabel('X Position')
-ax.set_ylabel('Y Position')
-ax.set_title(f'Motion Plot for {N} Particles over {n_steps} Steps (Alpha = {alpha})')
-ax.legend()
-ax.grid(True)
+# Set labels and titles for each subplot
+axs[0].set_xlabel('Time Step')
+axs[0].set_ylabel('X Position')
+axs[0].set_title(f'X Position vs Time Step for {N} Particles (Alpha = {alpha})')
+axs[0].legend()
+axs[0].grid(True)
 
-# Animation update function
-def update(frame):
-    for i, line in enumerate(lines):
-        line.set_data(x_positions[:frame, i], y_positions[:frame, i])
-    return lines
+axs[1].set_xlabel('Time Step')
+axs[1].set_ylabel('Y Position')
+axs[1].set_title(f'Y Position vs Time Step for {N} Particles (Alpha = {alpha})')
+axs[1].legend()
+axs[1].grid(True)
 
-# Create the animation
-ani = animation.FuncAnimation(fig, update, frames=int(n_steps), blit=True)
+axs[2].set_xlabel('Time Step')
+axs[2].set_ylabel('Z Position')
+axs[2].set_title(f'Z Position vs Time Step for {N} Particles (Alpha = {alpha})')
+axs[2].legend()
+axs[2].grid(True)
 
-if show.lower() == 'show':
-    plt.show()
-else:
-    ani.save(f"motion_plot_{case}_{N}_{n_steps}.mp4", writer='ffmpeg')
+plt.tight_layout()
+
+# Calculate the distance between the first two particles
+distances = np.sqrt((x_positions[:, 0] - x_positions[:, 1])**2 +
+                    (y_positions[:, 0] - y_positions[:, 1])**2 +
+                    (z_positions[:, 0] - z_positions[:, 1])**2)
+
+# Create a new figure for the distance plot
+fig_dist, ax_dist = plt.subplots(figsize=(10, 5))
+ax_dist.plot(time_steps, distances, label='Distance between Particle 1 and 2')
+ax_dist.set_xlabel('Time Step')
+ax_dist.set_ylabel('Distance')
+ax_dist.set_title(f'Distance between Particle 1 and 2 vs Time Step (Alpha = {alpha})')
+ax_dist.legend()
+ax_dist.grid(True)
+
+plt.tight_layout()
 
 if show.lower() == 'show':
     plt.show()

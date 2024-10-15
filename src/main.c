@@ -29,8 +29,8 @@ int main(int argc, char **argv) {
     double delta = 5.; // nice value for acceptance
 
     // variational parameters, to vary
-    double alpha_start = A0 * A0 + 2.;
-    double alpha_end = A0 * A0 + 8.;
+    double alpha_start = A0 * A0;
+    double alpha_end = A0 * A0;
     double alpha_step = 0.1;
     double beta1 = 2.5; // 0 to remove interaction
 
@@ -156,6 +156,14 @@ int main(int argc, char **argv) {
             for (int j = 0; j < 3 * N; j++) {
                 r[j] += (2. * (rand() / (1.0 + RAND_MAX)) - 1.) * delta;
             }
+            
+            // accepting the proposed step
+            double a = acceptance(r_old, r, var_param, N);
+            double a_rand = rand() / (1.0 + RAND_MAX);
+            if (a < a_rand) {
+                copy_array(r_old, r, 3 * N);
+                rej_rate += 1.;
+            } 
 
             // print positions
             if (argc >= 3 && alpha == alpha_saved) {
@@ -163,19 +171,6 @@ int main(int argc, char **argv) {
                     fprintf(f_positions, "%d,%.10e\n", i, r[j]);
                 }
             }
-            
-            // accepting the proposed step
-            // printf("r_old\n");
-            // print_array(r_old, 3 * N);
-            // printf("r\n");
-            // print_array(r, 3 * N);
-            // printf("\n");
-            double a = acceptance(r_old, r, var_param, N);
-            double a_rand = rand() / (1.0 + RAND_MAX);
-            if (a < a_rand) {
-                copy_array(r_old, r, 3 * N);
-                rej_rate += 1.;
-            } 
             
             // calculate observables
             T = kinetic_energy(r, var_param, N);
