@@ -67,6 +67,7 @@ int main(int argc, char **argv) {
     FILE *f_kinetic_avg = NULL;
     FILE *f_acceptance = NULL;
     FILE *f_psi = NULL;
+    FILE *f_pos = NULL;
 
     if (argc >= 3 && alpha_saved >= 0.) {
         char energy_path[100];
@@ -85,10 +86,22 @@ int main(int argc, char **argv) {
         snprintf(psi_path, sizeof(psi_path), "%s/psi_%.1f.csv", dir_name, alpha_saved);
         f_psi = fopen(psi_path, "w");
 
+        char pos_path[100];
+        snprintf(pos_path, sizeof(pos_path), "%s/pos_%.1f.csv", dir_name, alpha_saved);
+        f_pos = fopen(pos_path, "w");
+
         fprintf(f_energy, "i,T,V,E\n");
         fprintf(f_kinetic_avg, "i,T_lap,T_grad\n");
         fprintf(f_acceptance, "i,a\n");
         fprintf(f_psi, "i,psi\n");
+        
+        fprintf(f_pos, "i");
+        for (int i = 0; i < N; i++) {
+            char str[100];
+            snprintf(str, sizeof(str), ",x%d,y%d,z%d", i, i, i);
+            fprintf(f_pos, "%s", str);
+        }
+        fprintf(f_pos, "\n");
     }
 
     // print on terminal simulation parameters
@@ -114,7 +127,6 @@ int main(int argc, char **argv) {
         double T = kinetic_energy(r, var_param, N);
         double V = potential_energy(r, var_param, N);
         double E = T + V;
-        if (argc >= 3 && alpha == alpha_saved) fprintf(f_energy, "0,%.10e,%.10e,%.10e\n", T, V, E);
 
         // observables avg and std
         double T_avg = 0.;
@@ -127,7 +139,6 @@ int main(int argc, char **argv) {
         // initial observables, kinetic estimators
         double T_lap = kinetic_estimator_laplacian(r, var_param, N);
         double T_grad = kinetic_estimator_gradient(r, var_param, N);
-        if (argc >= 3 && alpha == alpha_saved) fprintf(f_kinetic_avg, "0,%.10e,%.10e\n", T_lap, T_grad);
 
         // kinetic estimatos avg and std
         double T_lap_avg = 0.;
@@ -137,7 +148,22 @@ int main(int argc, char **argv) {
 
         // initial acceptance
         double rej_rate = 0.;
-        if (argc >= 3 && alpha == alpha_saved) fprintf(f_acceptance, "0,%.10e\n", 1. - rej_rate);
+
+        // initial wavefunction
+        double psi_curr = psi(r, var_param, N);
+
+        if (argc >= 3 && alpha == alpha_saved) {
+            fprintf(f_energy, "0,%.10e,%.10e,%.10e\n", T, V, E);
+            fprintf(f_kinetic_avg, "0,%.10e,%.10e\n", T_lap, T_grad);
+            fprintf(f_acceptance, "0,%.10e\n", 1. - rej_rate);
+            fprintf(f_psi, "0,%.10e\n", psi_curr);
+
+            fprintf(f_pos, "0");
+            for (int i = 0; i < N; i++) {
+                fprintf(f_pos, ",%.10e,%.10e,%.10e", r[3 * i], r[3 * i + 1], r[3 * i + 2]);
+            }
+            fprintf(f_pos, "\n");
+        }
         
         // MC simul with fixed alpha
         double *r_old = malloc(3 * N * sizeof(double));
@@ -165,7 +191,6 @@ int main(int argc, char **argv) {
             T = kinetic_energy(r, var_param, N);
             V = potential_energy(r, var_param, N);
             E = T + V;
-            if (argc >= 3 && alpha == alpha_saved) fprintf(f_energy, "%d,%.10e,%.10e,%.10e\n", i, T, V, E);
 
             // observables avg and std
             T_avg += T;
@@ -178,7 +203,6 @@ int main(int argc, char **argv) {
             // calculate kinetic estimators
             T_lap = kinetic_estimator_laplacian(r, var_param, N);
             T_grad = kinetic_estimator_gradient(r, var_param, N);
-            if (argc >= 3 && alpha == alpha_saved) fprintf(f_kinetic_avg, "%d,%.10e,%.10e\n", i, T_lap, T_grad);
 
             // kinetic estimators avg and std
             T_lap_avg += T_lap;
@@ -186,13 +210,20 @@ int main(int argc, char **argv) {
             T_grad_avg += T_grad;
             T_grad2_avg += T_grad * T_grad;
 
-            // print acceptance rate
-            if (argc >= 3 && alpha == alpha_saved) fprintf(f_acceptance, "%d,%.10e\n", i, 1. - rej_rate / i);
-
-            // print wavefunction
+            // print on file
             if (argc >= 3 && alpha == alpha_saved) {
+                fprintf(f_energy, "%d,%.10e,%.10e,%.10e\n", i, T, V, E);
+                fprintf(f_kinetic_avg, "%d,%.10e,%.10e\n", i, T_lap, T_grad);
+                fprintf(f_acceptance, "%d,%.10e\n", i, 1. - rej_rate / i);
+
                 double psi_curr = psi(r, var_param, N);
                 fprintf(f_psi, "%d,%.10e\n", i, psi_curr);
+
+                fprintf(f_pos, "%d", i);
+                for (int j = 0; j < N; j++) {
+                    fprintf(f_pos, ",%.10e,%.10e,%.10e", r[3 * j], r[3 * j + 1], r[3 * j + 2]);
+                }
+                fprintf(f_pos, "\n");
             }
         }
         
