@@ -20,6 +20,8 @@ if not all_files:
 data = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
 i = data['i']
 a = data['a']
+a_rand = data['a_rand']
+rate = data['rate']
 
 # Extract alpha from the filenames
 alpha_values = []
@@ -34,7 +36,9 @@ alpha = np.mean(alpha_values) if alpha_values else 0.0
 plt.rcParams.update({'font.size': 14})
 plt.figure(figsize=(8, 6))
 
-plt.plot(i, a, linestyle='-', label='a')
+plt.plot(i, a, linestyle='none', marker='o', label='a')
+plt.plot(i, a_rand, linestyle='none', marker='o', label='a_rand')
+plt.plot(i, rate, linestyle='-', label='rate')
 plt.axhline(y=0.5, linestyle='--', color='tab:orange', label='50%')
 
 plt.title(f'Acceptance rate plot with N = {N}, steps = {n_steps}, alpha = {alpha}')

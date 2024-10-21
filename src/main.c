@@ -18,20 +18,25 @@ double potential_energy(double *r, double *var_param, int N) {
 int main(int argc, char **argv) {
     srand(1);
     // parameters
-    if (argc < 3) {
-        printf("Usage: %s N n_steps [alpha_saved]\n", argv[0]);
+    if (argc < 6) {
+        printf("Usage: %s N n_steps alpha_start alpha_end alpha_step [alpha_saved]\n", argv[0]);
         return 1;
     }
 
     int N = atoi(argv[1]);
     int n_steps = (int)strtod(argv[2], NULL);
-    double alpha_saved = (argc == 4) ? atof(argv[3]) : -1.;
+    double alpha_start = atof(argv[3]);
+    double alpha_end = atof(argv[4]);
+    double alpha_step = atof(argv[5]);
+    double alpha_saved = (argc == 7) ? atof(argv[6]) : -1.;
     double delta = 5.; // nice value for acceptance
 
+    if (alpha_saved != -1. && (alpha_saved < alpha_start || alpha_saved > alpha_end)) {
+        fprintf(stderr, "Error: alpha_saved (%.2f) must be between alpha_start (%.2f) and alpha_end (%.2f)\n", alpha_saved, alpha_start, alpha_end);
+        return 1;
+    }
+
     // variational parameters, to vary
-    double alpha_start = A0 * A0;
-    double alpha_end = A0 * A0;
-    double alpha_step = 1.;
     double beta1 = 2.5; // 0 to remove interaction
 
     // Create directory name
@@ -69,7 +74,7 @@ int main(int argc, char **argv) {
     FILE *f_psi = NULL;
     FILE *f_pos = NULL;
 
-    if (argc >= 3 && alpha_saved >= 0.) {
+    if (argc >= 6 && alpha_saved >= 0.) {
         char energy_path[100];
         snprintf(energy_path, sizeof(energy_path), "%s/energy_%.1f.csv", dir_name, alpha_saved);
         f_energy = fopen(energy_path, "w");
@@ -92,7 +97,7 @@ int main(int argc, char **argv) {
 
         fprintf(f_energy, "i,T,V,E\n");
         fprintf(f_kinetic_avg, "i,T_lap,T_grad\n");
-        fprintf(f_acceptance, "i,a\n");
+        fprintf(f_acceptance, "i,a,a_rand,rate\n");
         fprintf(f_psi, "i,psi\n");
         
         fprintf(f_pos, "i");
@@ -152,10 +157,10 @@ int main(int argc, char **argv) {
         // initial wavefunction
         double psi_curr = psi(r, var_param, N);
 
-        if (argc >= 3 && alpha == alpha_saved) {
+        if (argc >= 6 && alpha == alpha_saved) {
             fprintf(f_energy, "0,%.10e,%.10e,%.10e\n", T, V, E);
             fprintf(f_kinetic_avg, "0,%.10e,%.10e\n", T_lap, T_grad);
-            fprintf(f_acceptance, "0,%.10e\n", 1. - rej_rate);
+            fprintf(f_acceptance, "0,%.10e,%.10e,%.10e\n", 0., 0., 1. - rej_rate);
             fprintf(f_psi, "0,%.10e\n", psi_curr);
 
             fprintf(f_pos, "0");
@@ -211,10 +216,10 @@ int main(int argc, char **argv) {
             T_grad2_avg += T_grad * T_grad;
 
             // print on file
-            if (argc >= 3 && alpha == alpha_saved) {
+            if (argc >= 6 && alpha == alpha_saved) {
                 fprintf(f_energy, "%d,%.10e,%.10e,%.10e\n", i, T, V, E);
                 fprintf(f_kinetic_avg, "%d,%.10e,%.10e\n", i, T_lap, T_grad);
-                fprintf(f_acceptance, "%d,%.10e\n", i, 1. - rej_rate / i);
+                fprintf(f_acceptance, "%d,%.10e,%.10e,%.10e\n", i, a, a_rand, 1. - rej_rate / i);
 
                 double psi_curr = psi(r, var_param, N);
                 fprintf(f_psi, "%d,%.10e\n", i, psi_curr);

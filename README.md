@@ -27,7 +27,7 @@ Compile in the repository directory using:
 ```
 An executable named `run` will be generated. Use
 ```
-    ./run N n_steps [alpha_saved]
+    ./run N n_steps alpha_start alpha_end alpha_step [alpha_saved]
 ```
 to execute it, where `N` is the number of particles, `n_steps` is the number of Metropolis steps. `alpha_saved` is optional but it's needed to look at the observables values at a certain value of $\alpha$. For example, executing
 ```

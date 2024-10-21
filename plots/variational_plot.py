@@ -28,7 +28,7 @@ V_std = data['V_std']
 E_std = data['E_std']
 
 # Print energy
-print(f'Energy estimate for N={N} and {n_steps} steps: E = {data["E"][data["alpha"] == 25.0].values[0]:.4f} +/- {data["E_std"][data["alpha"] == 25.0].values[0]:.4f} K')
+#print(f'Energy estimate for N={N} and {n_steps} steps: E = {data["E"][data["alpha"] == 25.0].values[0]:.4f} +/- {data["E_std"][data["alpha"] == 25.0].values[0]:.4f} K')
 
 # Create subplots
 fig, axs = plt.subplots(1, 2, figsize=(12, 4.5))
