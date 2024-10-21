@@ -33,7 +33,7 @@ y_positions = data[[f'y{i}' for i in range(int(N))]].values
 z_positions = data[[f'z{i}' for i in range(int(N))]].values
 
 # Plot x1, x2
-time_steps = np.arange(int(n_steps) + 1)
+time_steps = np.arange(int(n_steps))
 fig, axs = plt.subplots(3, 1, figsize=(12, 8))
 for i in range(int(N)):  
     axs[0].plot(time_steps, x_positions[:, i], label=f'x{i}')

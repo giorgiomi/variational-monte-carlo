@@ -65,7 +65,7 @@ VH_old: old harmonic potential
 part_index: index of the particle that moved
 N: number of particles
 */
-double harmonic_potential(double *r_old, double *r_new, double VH_old, int part_index, int N);
+// double harmonic_potential(double *r_old, double *r_new, double VH_old, int part_index, int N);
 
 /*
 Calculates the Lennard-Jones potential contribution for a single particle
@@ -73,7 +73,7 @@ r: positions
 part_index: index of the particle
 N: number of particles
 */
-double LJ_potential_single(double *r, int part_index, int N);
+// double LJ_potential_single(double *r, int part_index, int N);
 
 /*
 Calculates the Lennard-Jones potential for N particles after a single particle moved
@@ -83,7 +83,7 @@ VLJ_old: old LJ potential
 part_index: index of the particle that moved
 N: number of particles
 */
-double LJ_potential(double *r_old, double *r_new, double VH_old, int part_index, int N);
+// double LJ_potential(double *r_old, double *r_new, double VH_old, int part_index, int N);
 
 /*
 Calculates the potential energy for N particles (LJ + harmonic) by brute force
@@ -92,5 +92,20 @@ var_param: variational parameters
 N: number of particles
 */
 double potential_bruteforce(double *r, double *var_param, int N);
+
+/*
+Calculates the LJ potential for N particles by brute force
+r: positions
+N: number of particles
+*/
+double LJ_potential(double *r, int N);
+
+/*
+Calculates the HO potential for N particles by brute force
+r: positions
+N: number of particles
+*/
+double HO_potential(double *r, int N);
+
 
 #endif

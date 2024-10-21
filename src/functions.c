@@ -179,31 +179,31 @@ double kinetic_estimator_gradient(double *r, double *param, int N) {
 }
 
 // harmonic potential after 1 move
-double harmonic_potential(double *r_old, double *r_new, double VH_old, int part_index, int N) {
-    double m_omega2 = H2_2M * 2. / pow(A0, 4);
-    double r2_old = scalar_product(r_old + 3 * part_index, r_old + 3 * part_index);
-    double r2_new = scalar_product(r_new + 3 * part_index, r_new + 3 * part_index);
+// double harmonic_potential(double *r_old, double *r_new, double VH_old, int part_index, int N) {
+//     double m_omega2 = H2_2M * 2. / pow(A0, 4);
+//     double r2_old = scalar_product(r_old + 3 * part_index, r_old + 3 * part_index);
+//     double r2_new = scalar_product(r_new + 3 * part_index, r_new + 3 * part_index);
     
-    return VH_old - 0.5 * m_omega2 * (r2_old - r2_new);
-}
+//     return VH_old - 0.5 * m_omega2 * (r2_old - r2_new);
+// }
 
 // LJ potential single contribution
-double LJ_potential_single(double *r, int part_index, int N) {
-    double VLJ_new = 0.;
-    for (int i = 0; i < N; i++) {
-        if (i != part_index) {
-            double rij[3] = {r[3 * i] - r[3 * part_index], r[3 * i + 1] - r[3 * part_index + 1], r[3 * i + 2] - r[3 * part_index + 2]};
-            double rij_mod = sqrt(scalar_product(rij, rij));
-            VLJ_new += lennard_jones(rij_mod);
-        }
-    }
-    return VLJ_new;
-}
+// double LJ_potential_single(double *r, int part_index, int N) {
+//     double VLJ_new = 0.;
+//     for (int i = 0; i < N; i++) {
+//         if (i != part_index) {
+//             double rij[3] = {r[3 * i] - r[3 * part_index], r[3 * i + 1] - r[3 * part_index + 1], r[3 * i + 2] - r[3 * part_index + 2]};
+//             double rij_mod = sqrt(scalar_product(rij, rij));
+//             VLJ_new += lennard_jones(rij_mod);
+//         }
+//     }
+//     return VLJ_new;
+// }
 
 // LJ potential after 1 move
-double LJ_potential(double *r_old, double *r_new, double VLJ_old, int part_index, int N) {
-    return VLJ_old - LJ_potential_single(r_old, part_index, N) + LJ_potential_single(r_new, part_index, N);
-}
+// double LJ_potential(double *r_old, double *r_new, double VLJ_old, int part_index, int N) {
+//     return VLJ_old - LJ_potential_single(r_old, part_index, N) + LJ_potential_single(r_new, part_index, N);
+// }
 
 // total potential (brute force)
 double potential_bruteforce(double *r, double *param, int N) {
@@ -237,4 +237,35 @@ double potential_bruteforce(double *r, double *param, int N) {
     // printf("\nVLJ: %f, VH: %f", VLJ, VH);
     return VLJ + VH;
     // return VH;
+}
+
+// total LJ potential (brute force)
+double LJ_potential(double *r, int N) {
+    double VLJ = 0.;
+
+    for (int i = 0; i < N; i++) {
+        double ri[3] = {r[3 * i], r[3 * i + 1], r[3 * i + 2]};
+        for (int j = i + 1; j < N; j++) {
+            double rj[3] = {r[3 * j], r[3 * j + 1], r[3 * j + 2]};
+            double rij[3] = {ri[0] - rj[0], ri[1] - rj[1], ri[2] - rj[2]};
+            double rij_mod = sqrt(scalar_product(rij, rij));
+            VLJ += lennard_jones(rij_mod);
+        }
+    }
+
+    return VLJ;
+}
+
+// total HO potential (brute force)
+double HO_potential(double *r, int N) {
+    double m_omega2 = H2_2M * 2. / pow(A0, 4);
+    double VHO = 0.;
+
+    for (int i = 0; i < N; i++) {
+        double ri[3] = {r[3 * i], r[3 * i + 1], r[3 * i + 2]};
+        double ri_mod2 = scalar_product(ri, ri);
+        VHO += 0.5 * m_omega2 * ri_mod2;
+    }
+
+    return VHO;
 }

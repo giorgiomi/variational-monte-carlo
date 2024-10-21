@@ -20,7 +20,8 @@ if not all_files:
 data = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
 i = data['i']
 T = data['T']
-V = data['V']
+VHO = data['VHO']
+VLJ = data['VLJ']
 E = data['E']
 
 # Extract alpha from the filenames
@@ -35,28 +36,42 @@ alpha = np.mean(alpha_values) if alpha_values else 0.0
 # compute averages and standard deviations
 T_avg = np.mean(T)
 T_std = np.std(T)
-V_avg = np.mean(V)
-V_std = np.std(V)
+VHO_avg = np.mean(VHO)
+VHO_std = np.std(VHO)
+VLJ_avg = np.mean(VLJ)
+VLJ_std = np.std(VLJ)
 E_avg = np.mean(E)
 E_std = np.std(E)
 
-# Plot the data
+# Plot VHO and VLJ
 plt.rcParams.update({'font.size': 14})
 plt.figure(figsize=(8, 6))
 
-plt.plot(i, V, linestyle='-', alpha=0.5, label=r'$\langle V \rangle$ = {:.3f} $\pm$ {:.3f} K'.format(V_avg, V_std/np.sqrt(len(V))))
-plt.plot(i, T, linestyle='-', alpha=0.5, label=r'$\langle T \rangle$ = {:.3f} $\pm$ {:.3f} K'.format(T_avg, T_std/np.sqrt(len(T))))
-plt.plot(i, E, linestyle='-', label=r'$\langle E \rangle$ = {:.3f} $\pm$ {:.3f} K'.format(E_avg, E_std/np.sqrt(len(E))))
+plt.plot(i, VHO, linestyle='-', alpha=0.5, label=r'$\langle V_{{HO}} \rangle$ = {:.3f} $\pm$ {:.3f} K'.format(VHO_avg, VHO_std/np.sqrt(len(VHO))))
+plt.plot(i, VLJ, linestyle='-', alpha=0.5, label=r'$\langle V_{{LJ}} \rangle$ = {:.3f} $\pm$ {:.3f} K'.format(VLJ_avg, VLJ_std/np.sqrt(len(VLJ))))
 
-plt.title(f'Energy plot with N = {N}, steps = {n_steps}, alpha = {alpha}')
+plt.title(f'VHO and VLJ plot with N = {N}, steps = {n_steps}, alpha = {alpha}')
 plt.xlabel('steps')
 plt.ylabel('energy [K]')
 
-# plt.yscale('log')
+plt.legend()
+plt.tight_layout()
+plt.savefig(f'report/figures/{case}/VHO_VLJ_{N}_{n_steps}.png', dpi=500)
+if (show == 'show'): 
+	plt.show()
+
+# Plot T and E
+plt.figure(figsize=(8, 6))
+
+plt.plot(i, T, linestyle='-', alpha=0.5, label=r'$\langle T \rangle$ = {:.3f} $\pm$ {:.3f} K'.format(T_avg, T_std/np.sqrt(len(T))))
+plt.plot(i, E, linestyle='-', label=r'$\langle E \rangle$ = {:.3f} $\pm$ {:.3f} K'.format(E_avg, E_std/np.sqrt(len(E))))
+
+plt.title(f'T and E plot with N = {N}, steps = {n_steps}, alpha = {alpha}')
+plt.xlabel('steps')
+plt.ylabel('energy [K]')
 
 plt.legend()
 plt.tight_layout()
-#plt.grid(True)
-plt.savefig(f'report/figures/{case}/energy_{N}_{n_steps}.png', dpi=500)
+plt.savefig(f'report/figures/{case}/T_E_{N}_{n_steps}.png', dpi=500)
 if (show == 'show'): 
-    plt.show()
+	plt.show()
