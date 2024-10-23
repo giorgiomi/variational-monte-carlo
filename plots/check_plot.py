@@ -36,35 +36,45 @@ for file in all_files:
 
 alpha = np.mean(alpha_values) if alpha_values else 0.0
 
-# Plot VLJ_new/VLJ_old and a
-plt.rcParams.update({'font.size': 14})
+# # Plot VLJ_new/VLJ_old and a
+# plt.rcParams.update({'font.size': 14})
+# plt.figure(figsize=(8, 6))
+
+# plt.plot(i, np.abs(VLJ_new/VLJ_old), linestyle='-', alpha=0.5, label=r'$\langle V_{{LJ,new}}/V_{{LJ,old}} \rangle$')
+# plt.plot(i, a, linestyle='-', alpha=0.5, label=r'$\langle a \rangle$')
+
+# plt.title(f'VLJ_new/VLJ_old and a plot with N = {N}, steps = {n_steps}, alpha = {alpha}')
+# plt.xlabel('steps')
+# plt.ylabel('check')
+# plt.legend()
+# plt.tight_layout()
+# plt.yscale('log')
+	
+# # Plot VHO_new/VHO_old and a
+# plt.figure(figsize=(8, 6))
+
+# plt.plot(i, np.abs(VHO_new/VHO_old), linestyle='-', alpha=0.5, label=r'$\langle V_{{HO,new}}/V_{{HO,old}} \rangle$')
+# plt.plot(i, a, linestyle='-', alpha=0.5, label=r'$\langle a \rangle$')
+
+# plt.title(f'VHO_new/VHO_old and a plot with N = {N}, steps = {n_steps}, alpha = {alpha}')
+# plt.xlabel('steps')
+# plt.ylabel('check')
+# plt.legend()
+# plt.tight_layout()
+# #plt.yscale('log')
+
+# Plot VHO_new/VHO_old and VLJ_new/VLJ_old
 plt.figure(figsize=(8, 6))
 
+plt.plot(i, np.abs(VHO_new/VHO_old), linestyle='-', alpha=0.5, label=r'$\langle V_{{HO,new}}/V_{{HO,old}} \rangle$')
 plt.plot(i, np.abs(VLJ_new/VLJ_old), linestyle='-', alpha=0.5, label=r'$\langle V_{{LJ,new}}/V_{{LJ,old}} \rangle$')
-plt.plot(i, a, linestyle='-', alpha=0.5, label=r'$\langle a \rangle$')
 
-plt.title(f'VLJ_new/VLJ_old and a plot with N = {N}, steps = {n_steps}, alpha = {alpha}')
+plt.title(f'VHO_new/VHO_old and VLJ_new/VLJ_old plot with N = {N}, steps = {n_steps}, alpha = {alpha}')
 plt.xlabel('steps')
 plt.ylabel('check')
 plt.legend()
 plt.tight_layout()
 plt.yscale('log')
-
-if (show == 'show'): 
-    plt.show()
-	
-# Plot VHO_new/VHO_old and a
-plt.figure(figsize=(8, 6))
-
-plt.plot(i, np.abs(VHO_new/VHO_old), linestyle='-', alpha=0.5, label=r'$\langle V_{{HO,new}}/V_{{HO,old}} \rangle$')
-plt.plot(i, a, linestyle='-', alpha=0.5, label=r'$\langle a \rangle$')
-
-plt.title(f'VHO_new/VHO_old and a plot with N = {N}, steps = {n_steps}, alpha = {alpha}')
-plt.xlabel('steps')
-plt.ylabel('check')
-plt.legend()
-plt.tight_layout()
-#plt.yscale('log')
 
 if (show == 'show'): 
     plt.show()

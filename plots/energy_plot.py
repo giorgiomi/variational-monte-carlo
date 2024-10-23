@@ -14,12 +14,20 @@ show = sys.argv[4]
 # Load data from CSV file
 path_pattern = f"data/{case}_{N}_{n_steps}/energy_*.csv"
 all_files = glob.glob(path_pattern)
-all_files = glob.glob(path_pattern)
 if not all_files:
 	raise FileNotFoundError(f"No files found for pattern: {path_pattern}")
 data = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
+
+path_pattern_kin = f"data/{case}_{N}_{n_steps}/kinetic_*.csv"
+all_files = glob.glob(path_pattern_kin)
+if not all_files:
+	raise FileNotFoundError(f"No files found for pattern: {path_pattern_kin}")
+data_kin = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
+
 i = data['i']
 T = data['T']
+T_lap = data_kin['T_lap']
+T_grad = data_kin['T_grad']
 VHO = data['VHO']
 VLJ = data['VLJ']
 E = data['E']
@@ -56,9 +64,7 @@ plt.ylabel('energy [K]')
 
 plt.legend()
 plt.tight_layout()
-plt.savefig(f'report/figures/{case}/VHO_VLJ_{N}_{n_steps}.png', dpi=500)
-if (show == 'show'): 
-	plt.show()
+# plt.savefig(f'report/figures/{case}/VHO_VLJ_{N}_{n_steps}.png', dpi=500)
 
 # Plot T and E
 plt.figure(figsize=(8, 6))
@@ -72,6 +78,21 @@ plt.ylabel('energy [K]')
 
 plt.legend()
 plt.tight_layout()
-plt.savefig(f'report/figures/{case}/T_E_{N}_{n_steps}.png', dpi=500)
+# plt.savefig(f'report/figures/{case}/T_E_{N}_{n_steps}.png', dpi=500)
+
+# Plot T+VHO+VLJ, T_lap+VHO+VLJ, T_grad+VHO+VLJ
+plt.figure(figsize=(8, 6))
+
+#plt.plot(i, E, linestyle='-', alpha=0.5, label=r'$\langle E \rangle$')
+#plt.plot(i, T_lap + VHO + VLJ, linestyle='-', label=r'$\langle T_{lap}+V_{HO}+V_{LJ} \rangle$')
+plt.plot(i, T_grad + VHO + VLJ, linestyle='-', label=r'$\langle T_{grad}+V_{HO}+V_{LJ} \rangle$')
+
+#plt.title(f'T+VHO+VLJ, T_lap+VHO+VLJ, T_grad+VHO+VLJ plot with N = {N}, steps = {n_steps}, alpha = {alpha}')
+plt.xlabel('steps')
+plt.ylabel('energy [K]')
+plt.legend()
+plt.tight_layout()
+plt.yscale('log')
+
 if (show == 'show'): 
 	plt.show()

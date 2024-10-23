@@ -54,7 +54,8 @@ plt.ylabel('T [K]')
 
 plt.legend()
 plt.tight_layout()
+#plt.yscale('log')
 #plt.grid(True)
-plt.savefig(f'report/figures/{case}/kinetic_{N}_{n_steps}.png', dpi=500)
+#plt.savefig(f'report/figures/{case}/kinetic_{N}_{n_steps}.png', dpi=500)
 if (show == 'show'):
     plt.show()
