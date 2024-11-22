@@ -57,63 +57,57 @@ double lennard_jones(double r) {
 // psi
 double psi(double *r, double *param, int N) {
     double alpha = param[0];
-    double beta[2] = {param[1], param[2]};
-    double r_sum = 0.;
-    double u_sum = 0.;
+    double beta1 = param[1];
+    double beta2 = param[2];
+    double sumA = 0.0;
+    double sumB = 0.0;
 
     for (int i = 0; i < N; i++) {
         double ri[3] = {r[3 * i], r[3 * i + 1], r[3 * i + 2]};
-        r_sum += scalar_product(ri, ri);
+        double ri_norm2 = scalar_product(ri, ri);
+        sumA += ri_norm2;
+
         for (int j = i + 1; j < N; j++) {
             double rj[3] = {r[3 * j], r[3 * j + 1], r[3 * j + 2]};
             double rij[3] = {ri[0] - rj[0], ri[1] - rj[1], ri[2] - rj[2]};
-            double rij_mod = sqrt(scalar_product(rij, rij));
-            u_sum += u(rij_mod, beta);
-            // printf("beta2: %f, u: %f\n", beta[1], u(rij_mod, beta));
+            double rij_norm = sqrt(scalar_product(rij, rij));
+            sumB += u(rij_norm, param);
         }
     }
 
-    return exp(- r_sum / (2. * alpha) - u_sum / 2); // remember to divide by 2
+    return exp(sumA * (-0.5 / alpha) - 0.5 * sumB);
 }
 
 // kinetic energy
 double kinetic_energy(double *r, double *param, int N) {
     double alpha = param[0];
     double beta[2] = {param[1], param[2]};
-    double res = 0.;
+    double sum = 0.0;
 
-    // cycle through i to calculate each kinetic contribution
     for (int i = 0; i < N; i++) {
         double ri[3] = {r[3 * i], r[3 * i + 1], r[3 * i + 2]};
-        double ri_mod2 = scalar_product(ri, ri);
-        res += 3. / alpha;
-        res -= ri_mod2 / (alpha * alpha);
+        double ri_norm2 = scalar_product(ri, ri);
+        sum += 3.0 / alpha;
+        sum -= ri_norm2 / (alpha * alpha);
 
-        // cycle through j != i
-        for (int j = 0; j < N; j++) {
-            if (j != i) {
-                double rj[3] = {r[3 * j], r[3 * j + 1], r[3 * j + 2]};
-                double rij[3] = {ri[0] - rj[0], ri[1] - rj[1], ri[2] - rj[2]};
-                double rij_mod = sqrt(scalar_product(rij, rij));
-                res += 0.5 * u_doubleprime(rij_mod, beta);
-                res += u_prime(rij_mod, beta) / rij_mod;
-                res -= u_prime(rij_mod, beta) * scalar_product(ri, rij) / (rij_mod * alpha);
+        for (int j = i + 1; j < N; j++) {
+            double rj[3] = {r[3 * j], r[3 * j + 1], r[3 * j + 2]};
+            double rij[3] = {ri[0] - rj[0], ri[1] - rj[1], ri[2] - rj[2]};
+            double rij_norm = sqrt(scalar_product(rij, rij));
+            sum += 2.0 * u_prime(rij_norm, beta) / rij_norm;
+            sum += u_doubleprime(rij_norm, beta);
+            sum -= 2.0 * u_prime(rij_norm, beta) * scalar_product(ri, rij) / rij_norm / alpha;
 
-                // cycle through l != i
-                for (int l = 0; l < N; l++) {
-                    if (l != i) {
-                        double rl[3] = {r[3 * l], r[3 * l + 1], r[3 * l + 2]};
-                        double ril[3] = {ri[0] - rl[0], ri[1] - rl[1], ri[2] - rl[2]};
-                        double ril_mod = sqrt(scalar_product(ril, ril));
-                        res -= 0.25 * u_prime(rij_mod, beta) * u_prime(ril_mod, beta) * scalar_product(rij, ril) / (rij_mod * ril_mod);
-                    }
-                }
+            for (int l = j + 1; l < N; l++) {
+                double rl[3] = {r[3 * l], r[3 * l + 1], r[3 * l + 2]};
+                double ril[3] = {ri[0] - rl[0], ri[1] - rl[1], ri[2] - rl[2]};
+                double ril_norm = sqrt(scalar_product(ril, ril));
+                sum -= 0.5 * u_prime(ril_norm, beta) * u_prime(rij_norm, beta) * scalar_product(ril, rij) / ril_norm / rij_norm;
             }
         }
     }
 
-    res *= H2_2M;
-    return res;
+    return sum * H2_2M;
 }
 
 // kinetic energy estimator with laplacian (Green theorem)

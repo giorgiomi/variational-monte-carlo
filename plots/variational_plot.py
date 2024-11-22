@@ -40,7 +40,7 @@ E_std_min = E_std[np.argmin(E)]
 # Create a 3D plot
 fig = plt.figure(figsize=(12, 6))
 ax = fig.add_subplot(111, projection='3d')
-
+ax.set_proj_type('ortho')
 
 # Plot the data
 # ax.plot_trisurf(alpha, beta1, T, label=r'$\langle T \rangle$', alpha=0.7)
@@ -67,4 +67,24 @@ ax.set_title(f'3D Plot for N={N} and {n_steps} steps')
 # Show the plot
 plt.legend()
 plt.tight_layout()
+
+# Plot E_std
+fig = plt.figure(figsize=(12, 6))
+ax = fig.add_subplot(111, projection='3d')
+ax.set_proj_type('ortho')
+
+# Plot the data
+ax.plot_trisurf(alpha, beta1, E_std, label=r'$\langle E \rangle$', alpha=0.7)
+
+# Add labels and title
+ax.set_xlabel(r'$\alpha$ $[Å^2]$')
+ax.set_ylabel(r'$\beta_1$ $[Å]$')
+ax.set_zlabel('Energy std [K]')
+ax.set_title(f'3D Plot for N={N} and {n_steps} steps')
+
+# Show the plot
+plt.legend()
+plt.tight_layout()
+
+
 plt.show()

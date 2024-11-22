@@ -215,6 +215,7 @@ int main(int argc, char **argv) {
                 T_grad_avg += T_grad_new;
                 T_grad2_avg += T_grad_new * T_grad_new;
 
+                
                 // print on file
                 if (argc >= 10 && alpha == alpha_saved) {
                     fprintf(f_energy, "%d,%.10e,%.10e,%.10e,%.10e\n", i, T_new, VHO_new, VLJ_new, E_new);
