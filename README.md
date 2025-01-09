@@ -38,3 +38,6 @@ will save the observable values of the simulation for $\alpha = 25\ \text{Å}^2$
     python3 plots/energy_plot.py N n_steps INT show
 ```
 where `INT` and `show` are needed for plotting the interacting simulation results and to show the graph. If the simulation is run with multiple values of the parameter $\alpha$, one can look at the energy as a function of that, by running `plots/variational_plot.py`. At the moment, this can be achieved by modifying `alpha_start` and `alpha_end` in `main.c`.
+
+## Important alert!
+At the moment, the simulation does not behave well, the energy in the MC simulation has huge peaks and the variational surface has got no minimum value. Please contact me if needed.
