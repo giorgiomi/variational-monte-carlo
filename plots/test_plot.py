@@ -4,7 +4,7 @@ import numpy as np
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
-data = pd.read_csv(f'data/test.csv')
+data = pd.read_csv(f'data/test/energies.csv')
 AlphaValues = np.arange(21.0, 36.0, 1.0)
 BetaValues = np.arange(1.95, 2.66, 0.05)
 Energies = np.array(data['energies'])

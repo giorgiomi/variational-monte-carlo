@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
 
     // parameters
     int N = 2;
-    int n_steps = 100000;
+    int n_steps = 10000;
     double alpha = 20.0;
     double alpha_step = 1.0;
     double beta = 1.9;
@@ -82,8 +82,11 @@ int main(int argc, char **argv) {
     double energies[max_var][max_var];
 
     // file
-    FILE *f_energies = fopen("data/test.csv", "w");
+    FILE *f_energies = fopen("data/test/energies.csv", "w");
     fprintf(f_energies, "alpha,beta,energies\n");
+
+    FILE *f_mc = fopen("data/test/MC.csv", "w");
+    fprintf(f_mc, "m,E\n");
 
     // print on terminal simulation parameters
     printf("==================================================================================\n");    
@@ -127,6 +130,11 @@ int main(int argc, char **argv) {
                     delta_energy = local_energy(r_old, alpha, beta);
                 }
                 energy += delta_energy;
+                if (ia == 5 && jb == 5) {
+                    printf("Printing on MC\n");
+                    fprintf(f_mc, "%d,%.10f\n", m, delta_energy);
+                }
+                
 
             }
             energy /= n_steps;
@@ -141,5 +149,7 @@ int main(int argc, char **argv) {
 
     free(r_old);
     free(r_new);
+    fclose(f_energies);
+    fclose(f_mc);
     return 0;
 }
