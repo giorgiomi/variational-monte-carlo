@@ -51,7 +51,7 @@ double u_doubleprime(double r, double *beta) {
 
 // LJ
 double lennard_jones(double r) {
-    return 4 * EPS * (pow(SIGMA / r, 12) - pow(SIGMA / r, 6));
+    return 4 * EPS * (pow(SIGMA / r, 12.) - pow(SIGMA / r, 6.));
 }
 
 // psi
@@ -59,6 +59,7 @@ double psi(double *r, double *param, int N) {
     double alpha = param[0];
     double beta1 = param[1];
     double beta2 = param[2];
+    double beta[2] = {beta1, beta2};
     double sumA = 0.0;
     double sumB = 0.0;
 
@@ -71,7 +72,7 @@ double psi(double *r, double *param, int N) {
             double rj[3] = {r[3 * j], r[3 * j + 1], r[3 * j + 2]};
             double rij[3] = {ri[0] - rj[0], ri[1] - rj[1], ri[2] - rj[2]};
             double rij_norm = sqrt(scalar_product(rij, rij));
-            sumB += u(rij_norm, param);
+            sumB += u(rij_norm, beta);
         }
     }
 

@@ -6,10 +6,10 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#define EPS 10.22   //[K]
-#define SIGMA 2.556 //[Å]
-#define A0 5.       //[Å]
-#define BETA2 5.    // adimensional, 5 is the correct value to oppose the LJ divergence
+const double EPS = 10.22;   //[K]
+const double SIGMA = 2.556; //[Å]
+const double A0 = 5.;       //[Å]
+const double BETA2 = 5.;    // adimensional, 5 is the correct value to oppose the LJ divergence
 
 double potential_energy(double *r, double *var_param, int N) {
     return potential_bruteforce(r, var_param, N);
